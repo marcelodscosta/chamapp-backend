@@ -4,6 +4,7 @@ import { ZodError } from 'zod'
 import { AppError } from './services/errors/app-error'
 import { globalAuthMiddleware } from './http/middleware/global-auth'
 import { healthRoutes } from './http/controllers/health/health-routes'
+import { authRoutes } from './http/controllers/auth/auth-routes'
 
 export async function buildApp() {
   const app = fastify({ logger: false })
@@ -19,9 +20,7 @@ export async function buildApp() {
 
   // ─── Rotas ─────────────────────────────────────────────────────────────────
   await app.register(healthRoutes)
-
-  // TODO: registrar as demais rotas conforme os módulos forem implementados
-  // await app.register(authRoutes, { prefix: '/auth' })
+  await app.register(authRoutes)
   // await app.register(userRoutes, { prefix: '/users' })
   // await app.register(productRoutes, { prefix: '/products' })
   // await app.register(categoryRoutes, { prefix: '/categories' })
