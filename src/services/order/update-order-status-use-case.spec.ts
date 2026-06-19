@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { UpdateOrderStatusUseCase } from './update-order-status-use-case'
 import { InMemoryOrderRepository } from '../../repositories/in-memory/in-memory-order-repository'
 import { InMemoryPushTokenRepository } from '../../repositories/in-memory/in-memory-push-token-repository'
+import { InMemoryLoyaltyRepository } from '../../repositories/in-memory/in-memory-loyalty-repository'
 import {
   IPushNotificationProvider,
   SendPushMessage,
@@ -19,6 +20,7 @@ class MockPushProvider implements IPushNotificationProvider {
 let orderRepository: InMemoryOrderRepository
 let pushTokenRepository: InMemoryPushTokenRepository
 let pushProvider: MockPushProvider
+let loyaltyRepository: InMemoryLoyaltyRepository
 let sut: UpdateOrderStatusUseCase
 
 describe('UpdateOrderStatusUseCase', () => {
@@ -26,10 +28,12 @@ describe('UpdateOrderStatusUseCase', () => {
     orderRepository = new InMemoryOrderRepository()
     pushTokenRepository = new InMemoryPushTokenRepository()
     pushProvider = new MockPushProvider()
+    loyaltyRepository = new InMemoryLoyaltyRepository()
     sut = new UpdateOrderStatusUseCase(
       orderRepository,
       pushTokenRepository,
       pushProvider,
+      loyaltyRepository,
     )
   })
 

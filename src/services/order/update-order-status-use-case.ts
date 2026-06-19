@@ -2,6 +2,8 @@ import { Order, OrderStatus, Role } from '../../generated/prisma'
 import { IOrderRepository } from '../../repositories/interfaces/IOrderRepository'
 import { IPushTokenRepository } from '../../repositories/interfaces/IPushTokenRepository'
 import { IPushNotificationProvider } from '../../providers/PushNotificationProvider/IPushNotificationProvider'
+import { ILoyaltyRepository } from '../../repositories/interfaces/ILoyaltyRepository'
+import { AddPointsTransactionUseCase } from '../loyalty/add-points-transaction-use-case'
 import { AppError } from '../errors/app-error'
 
 interface UpdateOrderStatusRequest {
@@ -22,6 +24,7 @@ export class UpdateOrderStatusUseCase {
     private orderRepository: IOrderRepository,
     private pushTokenRepository: IPushTokenRepository,
     private pushNotificationProvider: IPushNotificationProvider,
+    private loyaltyRepository: ILoyaltyRepository,
   ) {}
 
   async execute({
@@ -83,6 +86,31 @@ export class UpdateOrderStatusUseCase {
       // Lógica de pagamento para entregas via maquininha/dinheiro:
       if (!order.payment_confirmed) {
         updateData.payment_confirmed = true
+      }
+
+      // Fidelidade: Adiciona pontos quando o pedido é entregue
+      try {
+        const config = await this.loyaltyRepository.getConfig()
+        if (config?.program_enabled && order.customerId) {
+          const addPoints = new AddPointsTransactionUseCase(
+            this.loyaltyRepository,
+          )
+          // Exemplo básico: converte subtotal para pontos baseado em points_per_real
+          const pointsEarned = Math.floor(
+            Number(order.subtotal) * Number(config.points_per_real),
+          )
+
+          if (pointsEarned > 0) {
+            await addPoints.execute({
+              customerId: order.customerId,
+              orderId: order.id,
+              points: pointsEarned,
+              description: `Pedido ${order.order_number}`,
+            })
+          }
+        }
+      } catch (err) {
+        console.error('Erro ao processar fidelidade:', err)
       }
     } else if (newStatus === OrderStatus.CANCELLED) {
       updateData.cancelled_at = new Date()
