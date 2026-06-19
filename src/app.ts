@@ -9,6 +9,7 @@ import { userRoutes } from './http/controllers/user/user-routes'
 import { catalogRoutes } from './http/controllers/catalog/catalog-routes'
 import { addressRoutes } from './http/controllers/address/address-routes'
 import { orderRoutes } from './http/controllers/order/order-routes'
+import { notificationRoutes } from './http/controllers/notifications/notification-routes'
 
 export async function buildApp() {
   const app = fastify({ logger: false })
@@ -29,6 +30,7 @@ export async function buildApp() {
   await app.register(catalogRoutes)
   await app.register(addressRoutes)
   await app.register(orderRoutes)
+  await app.register(notificationRoutes)
   // await app.register(productRoutes, { prefix: '/products' })
   // await app.register(categoryRoutes, { prefix: '/categories' })
   // await app.register(addressRoutes, { prefix: '/addresses' })

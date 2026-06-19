@@ -1,5 +1,7 @@
 import { Order, OrderStatus, Role } from '../../generated/prisma'
 import { IOrderRepository } from '../../repositories/interfaces/IOrderRepository'
+import { IPushTokenRepository } from '../../repositories/interfaces/IPushTokenRepository'
+import { IPushNotificationProvider } from '../../providers/PushNotificationProvider/IPushNotificationProvider'
 import { AppError } from '../errors/app-error'
 
 interface UpdateOrderStatusRequest {
@@ -16,7 +18,11 @@ interface UpdateOrderStatusResponse {
 }
 
 export class UpdateOrderStatusUseCase {
-  constructor(private orderRepository: IOrderRepository) {}
+  constructor(
+    private orderRepository: IOrderRepository,
+    private pushTokenRepository: IPushTokenRepository,
+    private pushNotificationProvider: IPushNotificationProvider,
+  ) {}
 
   async execute({
     orderId,
@@ -88,6 +94,41 @@ export class UpdateOrderStatusUseCase {
       newStatus,
       updateData,
     )
+
+    // Enviar Push Notification
+    // Se o pedido mudou de status e o cliente for o dono, enviaremos notificação para o cliente
+    // Ignoramos quando o próprio cliente cancela (para não spammar ele mesmo)
+    if (userRole !== Role.CUSTOMER) {
+      const tokens = await this.pushTokenRepository.findByUserId(
+        order.customerId,
+      )
+
+      if (tokens.length > 0) {
+        let title = 'Atualização do Pedido'
+        let body = `Seu pedido ${order.order_number} teve o status atualizado.`
+
+        if (newStatus === OrderStatus.CONFIRMED) {
+          title = 'Pedido Confirmado! ✅'
+          body = `Seu pedido ${order.order_number} foi confirmado e está sendo preparado.`
+        } else if (newStatus === OrderStatus.OUT_FOR_DELIVERY) {
+          title = 'Saiu para Entrega! 🛵'
+          body = `Seu pedido ${order.order_number} está a caminho.`
+        } else if (newStatus === OrderStatus.DELIVERED) {
+          title = 'Pedido Entregue! 🎉'
+          body = `Seu pedido ${order.order_number} foi entregue com sucesso.`
+        } else if (newStatus === OrderStatus.CANCELLED) {
+          title = 'Pedido Cancelado ❌'
+          body = `Seu pedido ${order.order_number} foi cancelado.`
+        }
+
+        await this.pushNotificationProvider.send({
+          tokens: tokens.map((t) => t.token),
+          title,
+          body,
+          data: { orderId: order.id, status: newStatus },
+        })
+      }
+    }
 
     return { order: updatedOrder }
   }
