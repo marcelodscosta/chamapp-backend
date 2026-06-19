@@ -42,5 +42,5 @@ export interface IProductRepository {
   ): Promise<{ products: Product[]; total: number }>
   create(data: CreateProductData): Promise<Product>
   update(id: string, data: UpdateProductData): Promise<Product>
-  updateAvailability(id: string, is_available: boolean): Promise<Product>
+  updateAvailability(id: string, isAvailable: boolean): Promise<Product>
 }
