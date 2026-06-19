@@ -3,6 +3,7 @@ import {
   CreateTierData,
   CreateAccountData,
   AddTransactionData,
+  UpdateLoyaltyConfigData,
 } from '../interfaces/ILoyaltyRepository'
 import {
   LoyaltyConfig,
@@ -23,7 +24,7 @@ export class InMemoryLoyaltyRepository implements ILoyaltyRepository {
     return this.config
   }
 
-  async upsertConfig(data: Partial<LoyaltyConfig>): Promise<LoyaltyConfig> {
+  async upsertConfig(data: UpdateLoyaltyConfigData): Promise<LoyaltyConfig> {
     if (this.config) {
       this.config = {
         ...this.config,

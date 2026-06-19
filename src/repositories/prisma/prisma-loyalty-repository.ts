@@ -4,6 +4,7 @@ import {
   CreateTierData,
   CreateAccountData,
   AddTransactionData,
+  UpdateLoyaltyConfigData,
 } from '../interfaces/ILoyaltyRepository'
 import {
   LoyaltyConfig,
@@ -17,7 +18,7 @@ export class PrismaLoyaltyRepository implements ILoyaltyRepository {
     return prisma.loyaltyConfig.findFirst()
   }
 
-  async upsertConfig(data: Partial<LoyaltyConfig>): Promise<LoyaltyConfig> {
+  async upsertConfig(data: UpdateLoyaltyConfigData): Promise<LoyaltyConfig> {
     const existing = await prisma.loyaltyConfig.findFirst()
 
     if (existing) {

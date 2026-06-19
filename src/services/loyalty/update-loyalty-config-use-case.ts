@@ -1,11 +1,14 @@
 import { LoyaltyConfig } from '../../generated/prisma'
-import { ILoyaltyRepository } from '../../repositories/interfaces/ILoyaltyRepository'
+import {
+  ILoyaltyRepository,
+  UpdateLoyaltyConfigData,
+} from '../../repositories/interfaces/ILoyaltyRepository'
 
 export class UpdateLoyaltyConfigUseCase {
   constructor(private loyaltyRepository: ILoyaltyRepository) {}
 
   async execute(
-    data: Partial<LoyaltyConfig>,
+    data: UpdateLoyaltyConfigData,
   ): Promise<{ config: LoyaltyConfig }> {
     const config = await this.loyaltyRepository.upsertConfig(data)
     return { config }
