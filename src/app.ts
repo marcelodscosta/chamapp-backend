@@ -35,15 +35,7 @@ export async function buildApp() {
   await app.register(notificationRoutes)
   await app.register(settingsRoutes)
   await app.register(loyaltyRoutes)
-  // await app.register(productRoutes, { prefix: '/products' })
-  // await app.register(categoryRoutes, { prefix: '/categories' })
-  // await app.register(addressRoutes, { prefix: '/addresses' })
-  // await app.register(orderRoutes, { prefix: '/orders' })
-  // await app.register(pushTokenRoutes, { prefix: '/push-tokens' })
-  // await app.register(loyaltyRoutes, { prefix: '/loyalty' })
-  // await app.register(dashboardRoutes, { prefix: '/dashboard' })
-  // await app.register(storeSettingsRoutes, { prefix: '/store-settings' })
-  // await app.register(uploadRoutes, { prefix: '/upload' })
+
 
   // ─── Error Handler Global ──────────────────────────────────────────────────
   app.setErrorHandler((error, request, reply) => {
