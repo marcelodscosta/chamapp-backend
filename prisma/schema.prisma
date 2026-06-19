@@ -1,0 +1,391 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===========================
+// Enums
+// ===========================
+
+enum Role {
+  ADMIN
+  OPERATOR
+  DELIVERY
+  CUSTOMER
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  PIX
+  DINHEIRO
+  CARTAO_CREDITO
+  CARTAO_DEBITO
+  VALE_REFEICAO
+}
+
+enum Platform {
+  ANDROID
+  IOS
+  WEB
+}
+
+enum NotificationType {
+  ORDER_CONFIRMED
+  ORDER_OUT_FOR_DELIVERY
+  ORDER_DELIVERED
+  ORDER_CANCELLED
+  NEW_ORDER
+  LOW_STOCK
+  ASSIGNED_DELIVERY
+  MARKETING
+  POINTS_EARNED
+  POINTS_REDEEMED
+  POINTS_EXPIRING_SOON
+  POINTS_EXPIRED
+  TIER_UPGRADED
+  TIER_DOWNGRADED
+  POINTS_ADJUSTED
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
+
+enum LoyaltyMode {
+  POINTS
+  CASHBACK
+}
+
+enum LoyaltyTransactionType {
+  EARNED
+  REDEEMED
+  EXPIRED
+  ADJUSTED
+  REVERSED
+  BLOCKED
+  UNBLOCKED
+}
+
+// ===========================
+// Usuários
+// ===========================
+
+model User {
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  phone         String?
+  password_hash String
+  role          Role     @default(CUSTOMER)
+  avatar_url    String?
+  is_active     Boolean  @default(true)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  orders         Order[]    @relation("CustomerOrders")
+  deliveries     Order[]    @relation("DeliveryPerson")
+  addresses      Address[]
+  pushTokens     PushToken[]
+  loyaltyAccount LoyaltyAccount?
+
+  @@map("users")
+}
+
+// ===========================
+// Catálogo
+// ===========================
+
+model ProductCategory {
+  id         String    @id @default(uuid())
+  name       String    @unique
+  order      Int       @default(0)
+  is_active  Boolean   @default(true)
+  created_at DateTime  @default(now())
+
+  products Product[]
+
+  @@map("product_categories")
+}
+
+model Product {
+  id                    String  @id @default(uuid())
+  categoryId            String?
+  name                  String
+  description           String?
+  price                 Decimal @db.Decimal(10, 2)
+  image_url             String?
+  stock_quantity        Int     @default(0)
+  min_stock_alert       Int     @default(5)
+  requires_empty_return Boolean @default(false)
+  is_available          Boolean @default(true)
+  is_active             Boolean @default(true)
+
+  // Programa de Pontos
+  earns_points      Boolean  @default(true)
+  points_override   Int?
+  points_multiplier Decimal  @default(1) @db.Decimal(4, 2)
+  cashback_percent  Decimal? @db.Decimal(5, 2)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  category   ProductCategory? @relation(fields: [categoryId], references: [id])
+  orderItems OrderItem[]
+
+  @@map("products")
+}
+
+// ===========================
+// Endereços
+// ===========================
+
+model Address {
+  id           String   @id @default(uuid())
+  customerId   String
+  label        String?
+  street       String
+  number       String
+  complement   String?
+  neighborhood String
+  city         String
+  state        String
+  zip_code     String
+  reference    String?
+  is_default   Boolean  @default(false)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  customer User    @relation(fields: [customerId], references: [id])
+  orders   Order[]
+
+  @@map("addresses")
+}
+
+// ===========================
+// Pedidos
+// ===========================
+
+model Order {
+  id                  String        @id @default(uuid())
+  order_number        String        @unique
+  customerId          String
+  deliveryPersonId    String?
+  addressId           String
+  status              OrderStatus   @default(PENDING)
+  payment_method      PaymentMethod
+  change_for          Decimal?      @db.Decimal(10, 2)
+  has_empty_cylinder  Boolean       @default(false)
+  subtotal            Decimal       @db.Decimal(10, 2)
+  delivery_fee        Decimal       @default(0) @db.Decimal(10, 2)
+  total_value         Decimal       @db.Decimal(10, 2)
+  estimated_minutes   Int?
+  notes               String?
+  cancellation_reason String?
+  payment_confirmed   Boolean       @default(false)
+  delivery_proof_url  String?
+
+  // Programa de Pontos
+  points_redeemed Int     @default(0)
+  points_discount Decimal @default(0) @db.Decimal(10, 2)
+  points_earned   Int     @default(0)
+  cashback_earned Decimal @default(0) @db.Decimal(10, 2)
+
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  confirmed_at DateTime?
+  dispatched_at DateTime?
+  delivered_at DateTime?
+  cancelled_at DateTime?
+
+  customer            User                 @relation("CustomerOrders", fields: [customerId], references: [id])
+  deliveryPerson      User?                @relation("DeliveryPerson", fields: [deliveryPersonId], references: [id])
+  address             Address              @relation(fields: [addressId], references: [id])
+  items               OrderItem[]
+  loyaltyTransactions LoyaltyTransaction[]
+
+  @@index([customerId])
+  @@index([status])
+  @@index([deliveryPersonId])
+  @@index([created_at])
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  productId String
+  name      String
+  price     Decimal @db.Decimal(10, 2)
+  quantity  Int
+  subtotal  Decimal @db.Decimal(10, 2)
+  notes     String?
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+// ===========================
+// Push Notifications
+// ===========================
+
+model PushToken {
+  id         String   @id @default(uuid())
+  userId     String
+  token      String   @unique
+  platform   Platform
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("push_tokens")
+}
+
+model NotificationLog {
+  id         String             @id @default(uuid())
+  userId     String?
+  title      String
+  body       String
+  type       NotificationType
+  orderId    String?
+  status     NotificationStatus @default(PENDING)
+  attempts   Int                @default(0)
+  sent_at    DateTime?
+  error      String?
+  created_at DateTime           @default(now())
+
+  @@map("notification_logs")
+}
+
+// ===========================
+// Configurações da Loja
+// ===========================
+
+model StoreSettings {
+  id                  String   @id @default(uuid())
+  name                String
+  phone               String?
+  logo_url            String?
+  address             String?
+  delivery_fee        Decimal  @default(0) @db.Decimal(10, 2)
+  free_delivery_above Decimal? @db.Decimal(10, 2)
+  min_order_value     Decimal  @default(0) @db.Decimal(10, 2)
+  store_open          Boolean  @default(true)
+  opening_time        String?
+  closing_time        String?
+  updated_at          DateTime @updatedAt
+
+  @@map("store_settings")
+}
+
+// ===========================
+// Programa de Pontos / Cashback
+// ===========================
+
+model LoyaltyConfig {
+  id                   String      @id @default(uuid())
+  program_enabled      Boolean     @default(true)
+  program_mode         LoyaltyMode @default(POINTS)
+  points_per_real      Decimal     @default(10) @db.Decimal(10, 2)
+  conversion_rate      Decimal     @default(0.10) @db.Decimal(10, 4)
+  min_points_to_redeem Int         @default(500)
+  max_redeem_percent   Decimal     @default(50) @db.Decimal(5, 2)
+  expiry_days          Int         @default(365)
+  inactivity_days      Int         @default(90)
+  expiry_alert_days    Int[]       @default([15, 7])
+  updated_at           DateTime    @updatedAt
+
+  @@map("loyalty_config")
+}
+
+model LoyaltyTier {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  min_points Int
+  multiplier Decimal  @default(1) @db.Decimal(4, 2)
+  color_hex  String?
+  icon_url   String?
+  benefits   String[]
+  order      Int      @default(0)
+
+  accounts LoyaltyAccount[]
+
+  @@map("loyalty_tiers")
+}
+
+model LoyaltyAccount {
+  id               String    @id @default(uuid())
+  customerId       String    @unique
+  tierId           String
+  balance_points   Int       @default(0)
+  balance_cashback Decimal   @default(0) @db.Decimal(10, 2)
+  total_earned     Int       @default(0)
+  total_redeemed   Int       @default(0)
+  is_blocked       Boolean   @default(false)
+  last_activity_at DateTime  @default(now())
+  next_expiry_at   DateTime?
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+
+  customer     User                 @relation(fields: [customerId], references: [id])
+  tier         LoyaltyTier          @relation(fields: [tierId], references: [id])
+  transactions LoyaltyTransaction[]
+
+  @@map("loyalty_accounts")
+}
+
+model LoyaltyTransaction {
+  id             String                 @id @default(uuid())
+  accountId      String
+  orderId        String?
+  type           LoyaltyTransactionType
+  points         Int
+  cashback_amount Decimal               @default(0) @db.Decimal(10, 2)
+  balance_after  Int
+  description    String
+  reason         String?
+  performed_by   String?
+  reversed_by    String?
+  expires_at     DateTime?
+  created_at     DateTime               @default(now())
+
+  account LoyaltyAccount @relation(fields: [accountId], references: [id])
+  order   Order?         @relation(fields: [orderId], references: [id])
+
+  @@map("loyalty_transactions")
+}
+
+// ===========================
+// OTP para recuperação de senha
+// ===========================
+
+model OtpCode {
+  id         String   @id @default(uuid())
+  email      String
+  code       String
+  used       Boolean  @default(false)
+  expires_at DateTime
+  created_at DateTime @default(now())
+
+  @@map("otp_codes")
+}

@@ -1,0 +1,29 @@
+# Dependências
+node_modules/
+
+# Build
+dist/
+build/
+
+# Prisma generated
+src/generated/
+
+# Ambiente
+.env
+.env.local
+.env.production
+
+# Logs
+*.log
+logs/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Cobertura de testes
+coverage/

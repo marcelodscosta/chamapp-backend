@@ -1,0 +1,26 @@
+import { User, Role } from '../../generated/prisma'
+
+export interface CreateUserData {
+  name: string
+  email: string
+  password_hash: string
+  role?: Role
+  phone?: string
+}
+
+export interface UpdateUserData {
+  name?: string
+  phone?: string
+  avatar_url?: string
+  password_hash?: string
+  is_active?: boolean
+}
+
+export interface IUserRepository {
+  findById(id: string): Promise<User | null>
+  findByEmail(email: string): Promise<User | null>
+  create(data: CreateUserData): Promise<User>
+  update(id: string, data: UpdateUserData): Promise<User>
+  listAll(): Promise<User[]>
+  toggleStatus(id: string): Promise<User>
+}
