@@ -27,7 +27,7 @@ export async function createAddress(
 
   const useCase = makeCreateAddress()
   const { address } = await useCase.execute({
-    customerId: request.user.sub,
+    customerId: request.user!.id,
     ...data,
   })
 
@@ -40,7 +40,7 @@ export async function listAddresses(
 ) {
   const useCase = makeListAddresses()
   const { addresses } = await useCase.execute({
-    customerId: request.user.sub,
+    customerId: request.user!.id,
   })
 
   return reply.status(200).send({ addresses })
@@ -72,7 +72,7 @@ export async function updateAddress(
   const useCase = makeUpdateAddress()
   const { address } = await useCase.execute({
     addressId: id,
-    customerId: request.user.sub,
+    customerId: request.user!.id,
     ...data,
   })
 
@@ -92,7 +92,7 @@ export async function deleteAddress(
   const useCase = makeDeleteAddress()
   await useCase.execute({
     addressId: id,
-    customerId: request.user.sub,
+    customerId: request.user!.id,
   })
 
   return reply.status(204).send()
@@ -111,7 +111,7 @@ export async function setDefaultAddress(
   const useCase = makeSetDefaultAddress()
   await useCase.execute({
     addressId: id,
-    customerId: request.user.sub,
+    customerId: request.user!.id,
   })
 
   return reply.status(204).send()
