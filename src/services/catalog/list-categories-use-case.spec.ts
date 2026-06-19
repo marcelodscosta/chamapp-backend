@@ -19,6 +19,6 @@ describe('ListCategoriesUseCase', () => {
 
     expect(categories).toHaveLength(2)
     expect(categories[0].name).toBe('Bebidas') // order 1
-    expect(categories[1].name).toBe('Secos')   // order 2
+    expect(categories[1].name).toBe('Secos') // order 2
   })
 })

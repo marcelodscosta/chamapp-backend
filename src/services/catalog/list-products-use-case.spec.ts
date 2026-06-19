@@ -27,8 +27,16 @@ describe('ListProductsUseCase', () => {
   })
 
   it('deve filtrar produtos apenas disponíveis', async () => {
-    await productRepository.create({ name: 'Disp', price: 10, is_available: true })
-    await productRepository.create({ name: 'Indisp', price: 10, is_available: false })
+    await productRepository.create({
+      name: 'Disp',
+      price: 10,
+      is_available: true,
+    })
+    await productRepository.create({
+      name: 'Indisp',
+      price: 10,
+      is_available: false,
+    })
 
     const { products, total } = await sut.execute({ onlyAvailable: true })
 
