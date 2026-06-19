@@ -11,6 +11,7 @@ import {
   listProducts,
   toggleProductAvailability,
 } from './products-controller'
+import { uploadProductImage } from './upload-product-image-controller'
 import { requireRole } from '../../middleware/auth'
 import { Role } from '../../../generated/prisma'
 
@@ -46,6 +47,11 @@ export async function catalogRoutes(app: FastifyInstance) {
     '/products/:id/availability',
     { preHandler: [requireRole(Role.ADMIN, Role.OPERATOR)] },
     toggleProductAvailability,
+  )
+  app.patch(
+    '/products/:id/image',
+    { preHandler: [requireRole(Role.ADMIN, Role.OPERATOR)] },
+    uploadProductImage,
   )
 
   // (O patch para /products/:id/stock viria depois num controle de estoque)

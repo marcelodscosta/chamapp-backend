@@ -1,5 +1,6 @@
 import fastify from 'fastify'
 import cors from '@fastify/cors'
+import fastifyMultipart from '@fastify/multipart'
 import { ZodError } from 'zod'
 import { AppError } from './services/errors/app-error'
 import { globalAuthMiddleware } from './http/middleware/global-auth'
@@ -12,6 +13,7 @@ import { orderRoutes } from './http/controllers/order/order-routes'
 import { notificationRoutes } from './http/controllers/notifications/notification-routes'
 import { settingsRoutes } from './http/controllers/store/settings-routes'
 import { loyaltyRoutes } from './http/controllers/loyalty/loyalty-routes'
+import { dashboardRoutes } from './http/controllers/dashboard/dashboard-routes'
 
 export async function buildApp() {
   const app = fastify({ logger: false })
@@ -20,6 +22,12 @@ export async function buildApp() {
   await app.register(cors, {
     origin: true, // Em produção, especifique os domínios permitidos
     credentials: true,
+  })
+
+  await app.register(fastifyMultipart, {
+    limits: {
+      fileSize: 5 * 1024 * 1024, // 5MB
+    },
   })
 
   // ─── Global Auth Hook ───────────────────────────────────────────────────────
@@ -35,7 +43,7 @@ export async function buildApp() {
   await app.register(notificationRoutes)
   await app.register(settingsRoutes)
   await app.register(loyaltyRoutes)
-
+  await app.register(dashboardRoutes)
 
   // ─── Error Handler Global ──────────────────────────────────────────────────
   app.setErrorHandler((error, request, reply) => {
