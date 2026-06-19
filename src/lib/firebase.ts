@@ -1,5 +1,5 @@
 import admin from 'firebase-admin'
-import { env } from '../../env'
+import { env } from '../env'
 
 if (!admin.apps.length) {
   if (env.FCM_PROJECT_ID && env.FCM_PRIVATE_KEY && env.FCM_CLIENT_EMAIL) {
