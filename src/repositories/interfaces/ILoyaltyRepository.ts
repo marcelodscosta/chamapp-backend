@@ -63,6 +63,8 @@ export interface ILoyaltyRepository {
     cashbackToAdd: number,
     isEarned: boolean,
   ): Promise<LoyaltyAccount>
+  listInactiveAccounts(thresholdDate: Date): Promise<LoyaltyAccount[]>
+  resetAccountInactivity(accountId: string, baseTierId: string): Promise<LoyaltyAccount>
 
   // Transactions
   createTransaction(

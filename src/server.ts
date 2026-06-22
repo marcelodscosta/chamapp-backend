@@ -3,6 +3,7 @@ import { buildApp } from './app'
 import { logger } from './lib/logger'
 import { Server } from 'socket.io'
 import { appEvents } from './lib/events'
+import { startLoyaltyCron } from './jobs/loyalty-cron'
 
 async function main() {
   const app = await buildApp()
@@ -10,6 +11,8 @@ async function main() {
   try {
     await app.listen({ port: env.PORT, host: '0.0.0.0' })
     
+    startLoyaltyCron()
+
     const io = new Server(app.server, {
       cors: {
         origin: true,

@@ -162,4 +162,20 @@ export class InMemoryLoyaltyRepository implements ILoyaltyRepository {
       .filter((t) => t.accountId === accountId)
       .sort((a, b) => b.created_at.getTime() - a.created_at.getTime())
   }
+
+  async listInactiveAccounts(thresholdDate: Date): Promise<LoyaltyAccount[]> {
+    return this.accounts.filter(
+      (a) => a.last_activity_at < thresholdDate && (a.balance_points > 0 || Number(a.balance_cashback) > 0)
+    )
+  }
+
+  async resetAccountInactivity(accountId: string, baseTierId: string): Promise<LoyaltyAccount> {
+    const acc = this.accounts.find((a) => a.id === accountId)
+    if (!acc) throw new Error('Not found')
+    acc.balance_points = 0
+    acc.balance_cashback = new Decimal(0)
+    acc.tierId = baseTierId
+    acc.last_activity_at = new Date()
+    return acc
+  }
 }

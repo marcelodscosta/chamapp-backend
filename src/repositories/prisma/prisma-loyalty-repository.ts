@@ -102,6 +102,36 @@ export class PrismaLoyaltyRepository implements ILoyaltyRepository {
     })
   }
 
+  async listInactiveAccounts(thresholdDate: Date): Promise<LoyaltyAccount[]> {
+    return prisma.loyaltyAccount.findMany({
+      where: {
+        last_activity_at: { lt: thresholdDate },
+        OR: [
+          { balance_points: { gt: 0 } },
+          { balance_cashback: { gt: 0 } },
+          // Pega também se precisar rebaixar de tier (teria que ver o tier atual)
+        ],
+      },
+      include: { tier: true },
+    })
+  }
+
+  async resetAccountInactivity(accountId: string, baseTierId: string): Promise<LoyaltyAccount> {
+    return prisma.loyaltyAccount.update({
+      where: { id: accountId },
+      data: {
+        balance_points: 0,
+        balance_cashback: 0,
+        tierId: baseTierId,
+        // Mantém last_activity_at igual para não dar trigger toda noite, 
+        // ou atualiza para 'agora' para dar mais X dias pro cliente.
+        // Vamos atualizar para agora para ele só ser cobrado novamente daqui a 90 dias.
+        last_activity_at: new Date(), 
+      },
+      include: { tier: true },
+    })
+  }
+
   async createTransaction(
     data: AddTransactionData,
     balanceAfter: number,
