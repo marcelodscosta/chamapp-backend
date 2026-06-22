@@ -2,16 +2,18 @@ import { StoreSettings } from '../../generated/prisma'
 import { IStoreSettingsRepository } from '../../repositories/interfaces/IStoreSettingsRepository'
 
 interface UpdateStoreSettingsRequest {
-  name?: string
-  phone?: string
-  logo_url?: string
-  address?: string
+  name?: string | null
+  phone?: string | null
+  logo_url?: string | null
+  address?: string | null
   delivery_fee?: number
   free_delivery_above?: number | null
   min_order_value?: number
   store_open?: boolean
   opening_time?: string | null
   closing_time?: string | null
+  operating_days?: any
+  holidays?: any
 }
 
 interface UpdateStoreSettingsResponse {

@@ -13,6 +13,9 @@ const createOrderBodySchema = z.object({
   hasEmptyCylinder: z.boolean().optional(),
   deliveryFee: z.number().min(0),
   notes: z.string().optional(),
+  isScheduled: z.boolean().optional(),
+  scheduledDate: z.string().optional(),
+  scheduledTimeSlot: z.string().optional(),
   items: z
     .array(
       z.object({

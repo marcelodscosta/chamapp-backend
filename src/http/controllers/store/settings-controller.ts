@@ -16,16 +16,18 @@ export async function getStoreSettings(
 }
 
 const updateSettingsBodySchema = z.object({
-  name: z.string().optional(),
-  phone: z.string().optional(),
-  logo_url: z.string().url().optional(),
-  address: z.string().optional(),
-  delivery_fee: z.number().min(0).optional(),
-  free_delivery_above: z.number().min(0).nullable().optional(),
-  min_order_value: z.number().min(0).optional(),
+  name: z.string().nullish(),
+  phone: z.string().nullish(),
+  logo_url: z.string().url().nullish(),
+  address: z.string().nullish(),
+  delivery_fee: z.coerce.number().min(0).optional(),
+  free_delivery_above: z.coerce.number().min(0).nullish(),
+  min_order_value: z.coerce.number().min(0).optional(),
   store_open: z.boolean().optional(),
   opening_time: z.string().nullable().optional(),
   closing_time: z.string().nullable().optional(),
+  operating_days: z.any().optional(),
+  holidays: z.any().optional(),
 })
 
 export async function updateStoreSettings(

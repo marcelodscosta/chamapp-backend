@@ -60,6 +60,9 @@ export class PrismaOrderRepository implements IOrderRepository {
         notes: data.notes,
         points_redeemed: data.points_redeemed,
         points_discount: data.points_discount,
+        is_scheduled: data.is_scheduled,
+        scheduled_date: data.scheduled_date,
+        scheduled_time_slot: data.scheduled_time_slot,
         items: {
           create: data.items.map((item) => ({
             productId: item.productId,

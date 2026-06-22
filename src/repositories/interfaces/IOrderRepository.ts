@@ -27,6 +27,9 @@ export interface CreateOrderData {
   notes?: string
   points_redeemed?: number
   points_discount?: Decimal | number
+  is_scheduled?: boolean
+  scheduled_date?: Date
+  scheduled_time_slot?: string
   items: CreateOrderItemData[]
 }
 

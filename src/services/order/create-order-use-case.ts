@@ -19,6 +19,9 @@ interface CreateOrderRequest {
   hasEmptyCylinder?: boolean
   deliveryFee: number
   notes?: string
+  isScheduled?: boolean
+  scheduledDate?: string
+  scheduledTimeSlot?: string
   items: CreateOrderRequestItem[]
 }
 
@@ -41,6 +44,9 @@ export class CreateOrderUseCase {
     hasEmptyCylinder,
     deliveryFee,
     notes,
+    isScheduled,
+    scheduledDate,
+    scheduledTimeSlot,
     items,
   }: CreateOrderRequest): Promise<CreateOrderResponse> {
     if (items.length === 0) {
@@ -123,6 +129,9 @@ export class CreateOrderUseCase {
       delivery_fee: deliveryFee,
       total_value: totalValue,
       notes,
+      is_scheduled: isScheduled ?? false,
+      scheduled_date: scheduledDate ? new Date(scheduledDate) : undefined,
+      scheduled_time_slot: scheduledTimeSlot,
       items: processedItems,
     })
 

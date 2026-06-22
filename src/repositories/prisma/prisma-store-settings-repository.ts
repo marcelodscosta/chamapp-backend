@@ -16,7 +16,10 @@ export class PrismaStoreSettingsRepository implements IStoreSettingsRepository {
     if (existing) {
       return prisma.storeSettings.update({
         where: { id: existing.id },
-        data,
+        data: {
+          ...data,
+          name: data.name ?? existing.name, // Prisma não aceita null para name
+        },
       })
     }
 
@@ -32,6 +35,8 @@ export class PrismaStoreSettingsRepository implements IStoreSettingsRepository {
         store_open: data.store_open ?? true,
         opening_time: data.opening_time,
         closing_time: data.closing_time,
+        operating_days: data.operating_days ?? undefined,
+        holidays: data.holidays ?? undefined,
       },
     })
   }
