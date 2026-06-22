@@ -2,6 +2,7 @@ import { Order, PaymentMethod } from '../../generated/prisma'
 import { IOrderRepository } from '../../repositories/interfaces/IOrderRepository'
 import { IProductRepository } from '../../repositories/interfaces/IProductRepository'
 import { IAddressRepository } from '../../repositories/interfaces/IAddressRepository'
+import { ILoyaltyRepository } from '../../repositories/interfaces/ILoyaltyRepository'
 import { AppError } from '../errors/app-error'
 import { appEvents } from '../../lib/events'
 
@@ -23,6 +24,7 @@ interface CreateOrderRequest {
   scheduledDate?: string
   scheduledTimeSlot?: string
   items: CreateOrderRequestItem[]
+  useLoyaltyPoints?: boolean
 }
 
 interface CreateOrderResponse {
@@ -34,6 +36,7 @@ export class CreateOrderUseCase {
     private orderRepository: IOrderRepository,
     private productRepository: IProductRepository,
     private addressRepository: IAddressRepository,
+    private loyaltyRepository: ILoyaltyRepository,
   ) {}
 
   async execute({
@@ -48,6 +51,7 @@ export class CreateOrderUseCase {
     scheduledDate,
     scheduledTimeSlot,
     items,
+    useLoyaltyPoints,
   }: CreateOrderRequest): Promise<CreateOrderResponse> {
     if (items.length === 0) {
       throw new AppError('O pedido deve conter ao menos um item.', 400)
@@ -106,7 +110,28 @@ export class CreateOrderUseCase {
     // Futuro: adicionar taxa automática de casco se hasEmptyCylinder == false.
 
     // 4. Calcular o total
-    const totalValue = subtotal + deliveryFee
+    let totalValue = subtotal + deliveryFee
+    let pointsDiscount = 0
+    let pointsRedeemed = 0
+
+    // 5. Aplicar fidelidade se solicitado
+    if (useLoyaltyPoints) {
+      const config = await this.loyaltyRepository.getConfig()
+      if (config && config.program_enabled) {
+        const account = await this.loyaltyRepository.getAccountByCustomerId(customerId)
+        if (account && account.balance_points >= config.min_points_to_redeem && !account.is_blocked) {
+          // Calcula quantos pontos podem ser usados (limitado pelo saldo e pelo máximo de desconto permitido)
+          const maxDiscountValue = (Number(config.max_redeem_percent) / 100) * totalValue
+          const discountPerPoint = Number(config.conversion_rate)
+          const maxPointsByDiscount = Math.floor(maxDiscountValue / discountPerPoint)
+          
+          pointsRedeemed = Math.min(account.balance_points, maxPointsByDiscount)
+          pointsDiscount = pointsRedeemed * discountPerPoint
+
+          totalValue -= pointsDiscount
+        }
+      }
+    }
 
     // 5. Validar troco
     if (paymentMethod === 'DINHEIRO' && changeFor) {
@@ -133,7 +158,25 @@ export class CreateOrderUseCase {
       scheduled_date: scheduledDate ? new Date(scheduledDate) : undefined,
       scheduled_time_slot: scheduledTimeSlot,
       items: processedItems,
+      points_redeemed: pointsRedeemed,
+      points_discount: pointsDiscount,
     })
+
+    // Se usou pontos, registrar a transação
+    if (pointsRedeemed > 0) {
+      const account = await this.loyaltyRepository.getAccountByCustomerId(customerId)
+      if (account) {
+        const newBalance = account.balance_points - pointsRedeemed
+        await this.loyaltyRepository.createTransaction({
+          accountId: account.id,
+          orderId: order.id,
+          type: 'REDEEMED',
+          points: pointsRedeemed,
+          description: `Desconto de R$ ${pointsDiscount.toFixed(2).replace('.', ',')} no pedido ${order.order_number}`,
+        }, newBalance)
+        await this.loyaltyRepository.updateAccountBalance(account.id, -pointsRedeemed, 0, false)
+      }
+    }
 
     appEvents.emit('order:created', order)
 

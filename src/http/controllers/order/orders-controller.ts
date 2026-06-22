@@ -25,6 +25,7 @@ const createOrderBodySchema = z.object({
       }),
     )
     .min(1, 'Adicione pelo menos um item ao pedido'),
+  useLoyaltyPoints: z.boolean().optional(),
 })
 
 export async function createOrder(
