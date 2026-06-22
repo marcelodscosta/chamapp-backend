@@ -3,6 +3,7 @@ import { IOrderRepository } from '../../repositories/interfaces/IOrderRepository
 import { IProductRepository } from '../../repositories/interfaces/IProductRepository'
 import { IAddressRepository } from '../../repositories/interfaces/IAddressRepository'
 import { AppError } from '../errors/app-error'
+import { appEvents } from '../../lib/events'
 
 interface CreateOrderRequestItem {
   productId: string
@@ -124,6 +125,8 @@ export class CreateOrderUseCase {
       notes,
       items: processedItems,
     })
+
+    appEvents.emit('order:created', order)
 
     return { order }
   }

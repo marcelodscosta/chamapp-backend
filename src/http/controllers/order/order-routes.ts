@@ -21,4 +21,5 @@ export async function orderRoutes(app: FastifyInstance) {
 
   // Status e outras atualizações (Regras de negócio tratam quem pode fazer o que)
   app.patch('/orders/:id/status', updateOrderStatus)
+
 }
