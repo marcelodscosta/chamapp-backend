@@ -5,11 +5,27 @@ export interface RevenueByDay {
   revenue: number
 }
 
+export interface SalesByPaymentMethod {
+  method: string
+  total: number
+  count: number
+}
+
+export interface ProductSales {
+  productId: string
+  name: string
+  quantitySold: number
+  totalRevenue: number
+  averageTicket: number
+}
+
 export interface DashboardMetrics {
   totalRevenue: number
   totalOrders: number
   ordersByStatus: Record<string, number>
   revenueByDay: RevenueByDay[]
+  salesByPaymentMethod: SalesByPaymentMethod[]
+  productSales: ProductSales[]
   newCustomers: number
 }
 

@@ -9,6 +9,10 @@ export async function getStoreAvailability(
   const useCase = makeGetStoreSettings()
   const { settings } = await useCase.execute()
 
+  if (!settings) {
+    return reply.status(404).send({ message: 'Configurações da loja não encontradas.' })
+  }
+
   const operatingDays = (settings.operating_days as Array<any>) || [
     { day: 0, open: false },
     { day: 1, open: true, start: "08:00", end: "18:00" },

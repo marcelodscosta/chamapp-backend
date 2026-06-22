@@ -51,6 +51,8 @@ export class InMemoryStoreSettingsRepository implements IStoreSettingsRepository
       store_open: data.store_open ?? true,
       opening_time: data.opening_time ?? null,
       closing_time: data.closing_time ?? null,
+      operating_days: data.operating_days ?? null,
+      holidays: data.holidays ?? null,
       updated_at: new Date(),
     }
 

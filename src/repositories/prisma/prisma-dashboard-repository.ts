@@ -79,11 +79,64 @@ export class PrismaDashboardRepository implements IDashboardRepository {
       },
     })
 
+    // Agrupamento por Meio de Pagamento
+    const paymentGroup = await prisma.order.groupBy({
+      by: ['payment_method'],
+      where: {
+        created_at: { gte: startDate, lte: endDate },
+        status: { in: [OrderStatus.DELIVERED, OrderStatus.CONFIRMED, OrderStatus.OUT_FOR_DELIVERY] }
+      },
+      _sum: { total_value: true },
+      _count: { id: true },
+    })
+
+    const salesByPaymentMethod = paymentGroup.map(group => ({
+      method: group.payment_method,
+      total: Number(group._sum.total_value) || 0,
+      count: group._count.id,
+    }))
+
+    // Vendas por Produto (Extraído do OrderItem)
+    const productSalesRaw = await prisma.orderItem.findMany({
+      where: {
+        order: {
+          created_at: { gte: startDate, lte: endDate },
+          status: { in: [OrderStatus.DELIVERED, OrderStatus.CONFIRMED, OrderStatus.OUT_FOR_DELIVERY] }
+        }
+      },
+      select: {
+        productId: true,
+        name: true,
+        quantity: true,
+        subtotal: true,
+      }
+    })
+
+    const productMap: Record<string, { name: string, quantitySold: number, totalRevenue: number }> = {}
+
+    for (const item of productSalesRaw) {
+      if (!productMap[item.productId]) {
+        productMap[item.productId] = { name: item.name, quantitySold: 0, totalRevenue: 0 }
+      }
+      productMap[item.productId].quantitySold += item.quantity
+      productMap[item.productId].totalRevenue += Number(item.subtotal)
+    }
+
+    const productSales = Object.entries(productMap).map(([productId, data]) => ({
+      productId,
+      name: data.name,
+      quantitySold: data.quantitySold,
+      totalRevenue: data.totalRevenue,
+      averageTicket: data.quantitySold > 0 ? data.totalRevenue / data.quantitySold : 0
+    })).sort((a, b) => b.totalRevenue - a.totalRevenue) // Ordenar por receita gerada
+
     return {
       totalRevenue: Number(revenueAggr._sum.total_value) || 0,
       totalOrders: revenueAggr._count.id || 0,
       ordersByStatus,
       revenueByDay,
+      salesByPaymentMethod,
+      productSales,
       newCustomers: newCustomersCount,
     }
   }
