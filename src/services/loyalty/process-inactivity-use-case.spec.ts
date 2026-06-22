@@ -5,6 +5,8 @@ import { Decimal } from '../../generated/prisma/runtime/library'
 
 let loyaltyRepository: InMemoryLoyaltyRepository
 let sut: ProcessInactivityUseCase
+let tierBronzeId: string
+let tierOuroId: string
 
 describe('ProcessInactivityUseCase', () => {
   beforeEach(async () => {
@@ -18,12 +20,14 @@ describe('ProcessInactivityUseCase', () => {
       min_points: 0,
       order: 1,
     })
+    tierBronzeId = tierBronze.id
 
     const tierOuro = await loyaltyRepository.createTier({
       name: 'Ouro',
       min_points: 1000,
       order: 2,
     })
+    tierOuroId = tierOuro.id
 
     // Cliente inativo (100 dias atrás)
     const inactiveDate = new Date()
@@ -62,10 +66,10 @@ describe('ProcessInactivityUseCase', () => {
 
     const inactiveAccount = await loyaltyRepository.getAccountByCustomerId('cust-inactive')
     expect(inactiveAccount?.balance_points).toBe(0)
-    expect(inactiveAccount?.tier.name).toBe('Bronze')
+    expect(inactiveAccount?.tierId).toBe(tierBronzeId)
 
     const activeAccount = await loyaltyRepository.getAccountByCustomerId('cust-active')
     expect(activeAccount?.balance_points).toBe(800)
-    expect(activeAccount?.tier.name).toBe('Ouro')
+    expect(activeAccount?.tierId).toBe(tierOuroId)
   })
 })

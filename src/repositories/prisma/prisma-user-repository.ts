@@ -24,7 +24,14 @@ export class PrismaUserRepository implements IUserRepository {
   }
 
   async listAll(): Promise<User[]> {
-    return prisma.user.findMany({ orderBy: { created_at: 'desc' } })
+    return prisma.user.findMany({ 
+      orderBy: { created_at: 'desc' },
+      include: {
+        loyaltyAccount: {
+          include: { tier: true }
+        }
+      }
+    })
   }
 
   async toggleStatus(id: string): Promise<User> {

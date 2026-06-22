@@ -33,7 +33,8 @@ export class ProcessInactivityUseCase {
       await this.loyaltyRepository.resetAccountInactivity(account.id, baseTier.id)
 
       // 2. Grava a transação de perda de pontos por expiração
-      if (account.balance_points > 0 || account.balance_cashback > 0) {
+      if (account.balance_points > 0 || Number(account.balance_cashback) > 0) {
+
         await this.loyaltyRepository.createTransaction(
           {
             accountId: account.id,
