@@ -22,6 +22,7 @@ export async function buildApp() {
   await app.register(cors, {
     origin: true, // Em produção, especifique os domínios permitidos
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   })
 
   await app.register(fastifyMultipart, {

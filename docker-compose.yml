@@ -2,16 +2,16 @@ version: '3'
 
 services:
   chamapp-db:
-    image: bitnami/postgresql:latest
+    image: postgres:15-alpine
     container_name: chamapp-db
     ports:
       - '5432:5432'
     environment:
-      - POSTGRESQL_USERNAME=docker
-      - POSTGRESQL_PASSWORD=docker
-      - POSTGRESQL_DATABASE=chamapp
+      - POSTGRES_USER=docker
+      - POSTGRES_PASSWORD=docker
+      - POSTGRES_DB=chamapp
     volumes:
-      - chamapp_pg_data:/bitnami/postgresql
+      - chamapp_pg_data:/var/lib/postgresql/data
 
 volumes:
   chamapp_pg_data:
