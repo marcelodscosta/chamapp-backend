@@ -60,9 +60,7 @@ export async function buildApp() {
         message: error.message,
       })
     }
-
-    request.log.error(error)
-
+    console.error('[500 ERROR]', error)
     return reply.status(500).send({
       message: 'Erro interno no servidor.',
     })
