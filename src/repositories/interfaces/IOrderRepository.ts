@@ -3,6 +3,8 @@ import {
   OrderStatus,
   PaymentMethod,
   OrderItem,
+  User,
+  Address,
 } from '../../generated/prisma'
 import { Decimal } from '../../generated/prisma/runtime/library'
 
@@ -41,7 +43,11 @@ export interface ListOrdersParams {
   limit?: number
 }
 
-export type OrderWithItems = Order & { items: OrderItem[] }
+export type OrderWithItems = Order & { 
+  items: OrderItem[]
+  customer?: User
+  address?: Address
+}
 
 export interface IOrderRepository {
   findById(id: string): Promise<OrderWithItems | null>

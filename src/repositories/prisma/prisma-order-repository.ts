@@ -11,7 +11,7 @@ export class PrismaOrderRepository implements IOrderRepository {
   async findById(id: string): Promise<OrderWithItems | null> {
     return prisma.order.findUnique({
       where: { id },
-      include: { items: true },
+      include: { items: true, customer: true, address: true },
     })
   }
 
@@ -35,7 +35,7 @@ export class PrismaOrderRepository implements IOrderRepository {
         skip,
         take: limit,
         orderBy: { created_at: 'desc' },
-        include: { items: true },
+        include: { items: true, customer: true, address: true },
       }),
       prisma.order.count({ where }),
     ])
