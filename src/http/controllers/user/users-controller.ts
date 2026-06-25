@@ -44,6 +44,8 @@ const toggleStatusParamsSchema = z.object({
   id: z.string().uuid('ID inválido.'),
 })
 
+import { makeUpdateUserProfile } from '../../../services/factories/make-update-user-profile'
+
 export async function toggleStatus(
   request: FastifyRequest,
   reply: FastifyReply,
@@ -52,6 +54,34 @@ export async function toggleStatus(
 
   const useCase = makeToggleUserStatus()
   const { user } = await useCase.execute({ userId: id })
+
+  return reply.status(200).send({ user })
+}
+
+const updateUserParamsSchema = z.object({
+  id: z.string().uuid('ID inválido.'),
+})
+
+const updateUserBodySchema = z.object({
+  name: z.string().min(2, 'Nome deve ter ao menos 2 caracteres.').optional(),
+  email: z.string().email('E-mail inválido.').optional(),
+  phone: z.string().optional(),
+})
+
+export async function updateUser(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  const { id } = updateUserParamsSchema.parse(request.params)
+  const { name, email, phone } = updateUserBodySchema.parse(request.body)
+
+  const useCase = makeUpdateUserProfile()
+  const { user } = await useCase.execute({
+    userId: id,
+    name,
+    email,
+    phone,
+  })
 
   return reply.status(200).send({ user })
 }

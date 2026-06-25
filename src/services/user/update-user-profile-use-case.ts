@@ -6,6 +6,7 @@ import { AppError } from '../errors/app-error'
 interface UpdateUserProfileRequest {
   userId: string
   name?: string
+  email?: string
   phone?: string
   password?: string
   avatarUrl?: string
@@ -21,6 +22,7 @@ export class UpdateUserProfileUseCase {
   async execute({
     userId,
     name,
+    email,
     phone,
     password,
     avatarUrl,
@@ -31,6 +33,13 @@ export class UpdateUserProfileUseCase {
       throw new AppError('Usuário não encontrado.', 404)
     }
 
+    if (email && email !== user.email) {
+      const emailExists = await this.userRepository.findByEmail(email)
+      if (emailExists) {
+        throw new AppError('Este e-mail já está em uso.', 409)
+      }
+    }
+
     let passwordHash: string | undefined
 
     if (password) {
@@ -39,6 +48,7 @@ export class UpdateUserProfileUseCase {
 
     const updatedUser = await this.userRepository.update(userId, {
       name,
+      email,
       phone,
       password_hash: passwordHash,
       avatar_url: avatarUrl,

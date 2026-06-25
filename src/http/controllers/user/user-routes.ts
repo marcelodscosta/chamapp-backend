@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { getProfile, updateProfile } from './profile-controller'
-import { listUsers, createStaff, toggleStatus } from './users-controller'
+import { listUsers, createStaff, toggleStatus, updateUser } from './users-controller'
 import { requireRole } from '../../middleware/auth'
 import { Role } from '../../../generated/prisma'
 
@@ -17,5 +17,10 @@ export async function userRoutes(app: FastifyInstance) {
     '/users/:id/toggle-status',
     { preHandler: [requireRole(Role.ADMIN)] },
     toggleStatus,
+  )
+  app.put(
+    '/users/:id',
+    { preHandler: [requireRole(Role.ADMIN)] },
+    updateUser,
   )
 }
