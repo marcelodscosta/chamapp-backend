@@ -51,10 +51,18 @@ export class InMemoryUserRepository implements IUserRepository {
   }
 
   async toggleStatus(id: string): Promise<User> {
-    const index = this.items.findIndex((u) => u.id === id)
-    if (index === -1) throw new Error(`User ${id} not found`)
+    const user = this.items.find((item) => item.id === id)
 
-    this.items[index].is_active = !this.items[index].is_active
-    return this.items[index]
+    if (!user) {
+      throw new Error('User not found.')
+    }
+
+    user.is_active = !user.is_active
+
+    return user
+  }
+
+  async findUsersByMarketingFilter(filter: 'ALL' | 'NEVER_BOUGHT' | 'INACTIVE_30_DAYS'): Promise<User[]> {
+    return this.items.filter(u => u.role === 'CUSTOMER' && u.is_active)
   }
 }

@@ -41,4 +41,40 @@ export class PrismaUserRepository implements IUserRepository {
       data: { is_active: !user.is_active },
     })
   }
+
+  async findUsersByMarketingFilter(filter: 'ALL' | 'NEVER_BOUGHT' | 'INACTIVE_30_DAYS'): Promise<User[]> {
+    const thirtyDaysAgo = new Date()
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+
+    if (filter === 'NEVER_BOUGHT') {
+      return prisma.user.findMany({
+        where: {
+          role: 'CUSTOMER',
+          is_active: true,
+          orders: { none: {} },
+        },
+      })
+    }
+
+    if (filter === 'INACTIVE_30_DAYS') {
+      return prisma.user.findMany({
+        where: {
+          role: 'CUSTOMER',
+          is_active: true,
+          orders: {
+            some: {},
+            every: { created_at: { lt: thirtyDaysAgo } },
+          },
+        },
+      })
+    }
+
+    // Padrão: ALL
+    return prisma.user.findMany({
+      where: {
+        role: 'CUSTOMER',
+        is_active: true,
+      },
+    })
+  }
 }

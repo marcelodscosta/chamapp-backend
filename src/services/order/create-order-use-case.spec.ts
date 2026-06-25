@@ -3,11 +3,13 @@ import { CreateOrderUseCase } from './create-order-use-case'
 import { InMemoryOrderRepository } from '../../repositories/in-memory/in-memory-order-repository'
 import { InMemoryProductRepository } from '../../repositories/in-memory/in-memory-product-repository'
 import { InMemoryAddressRepository } from '../../repositories/in-memory/in-memory-address-repository'
+import { InMemoryLoyaltyRepository } from '../../repositories/in-memory/in-memory-loyalty-repository'
 import { AppError } from '../errors/app-error'
 
 let orderRepository: InMemoryOrderRepository
 let productRepository: InMemoryProductRepository
 let addressRepository: InMemoryAddressRepository
+let loyaltyRepository: InMemoryLoyaltyRepository
 let sut: CreateOrderUseCase
 
 describe('CreateOrderUseCase', () => {
@@ -15,10 +17,12 @@ describe('CreateOrderUseCase', () => {
     orderRepository = new InMemoryOrderRepository()
     productRepository = new InMemoryProductRepository()
     addressRepository = new InMemoryAddressRepository()
+    loyaltyRepository = new InMemoryLoyaltyRepository()
     sut = new CreateOrderUseCase(
       orderRepository,
       productRepository,
       addressRepository,
+      loyaltyRepository
     )
   })
 

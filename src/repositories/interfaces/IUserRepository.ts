@@ -10,6 +10,7 @@ export interface CreateUserData {
 
 export interface UpdateUserData {
   name?: string
+  email?: string
   phone?: string
   avatar_url?: string
   password_hash?: string
@@ -23,4 +24,5 @@ export interface IUserRepository {
   update(id: string, data: UpdateUserData): Promise<User>
   listAll(): Promise<User[]>
   toggleStatus(id: string): Promise<User>
+  findUsersByMarketingFilter(filter: 'ALL' | 'NEVER_BOUGHT' | 'INACTIVE_30_DAYS'): Promise<User[]>
 }
