@@ -10,6 +10,10 @@ import { UpdateBannerUseCase } from '../partner/update-banner-use-case'
 import { DeleteBannerUseCase } from '../partner/delete-banner-use-case'
 import { TrackBannerInteractionUseCase } from '../partner/track-banner-interaction-use-case'
 import { GetPartnerUseCase } from '../partner/get-partner-use-case'
+import { UploadPartnerLogoUseCase } from '../partner/upload-partner-logo-use-case'
+import { UploadBannerImageUseCase } from '../partner/upload-banner-image-use-case'
+import { S3StorageProvider } from '../../providers/StorageProvider/S3StorageProvider'
+
 
 
 export function makeCreatePartner() {
@@ -66,4 +70,17 @@ export function makeGetPartner() {
   const repository = new PrismaPartnerRepository()
   return new GetPartnerUseCase(repository)
 }
+
+export function makeUploadPartnerLogo() {
+  const repository = new PrismaPartnerRepository()
+  const storageProvider = new S3StorageProvider()
+  return new UploadPartnerLogoUseCase(repository, storageProvider)
+}
+
+export function makeUploadBannerImage() {
+  const repository = new PrismaPartnerRepository()
+  const storageProvider = new S3StorageProvider()
+  return new UploadBannerImageUseCase(repository, storageProvider)
+}
+
 

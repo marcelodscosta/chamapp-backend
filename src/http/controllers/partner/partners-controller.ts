@@ -12,8 +12,12 @@ import {
   makeDeleteBanner,
   makeTrackBannerInteraction,
   makeGetPartner,
+  makeUploadPartnerLogo,
+  makeUploadBannerImage,
 } from '../../../services/factories/make-partners'
 import { BannerTargetType } from '../../../generated/prisma'
+import { AppError } from '../../../services/errors/app-error'
+
 
 // --- Parceiros ---
 const createPartnerBodySchema = z.object({
@@ -172,3 +176,52 @@ export async function trackInteraction(request: FastifyRequest, reply: FastifyRe
   await useCase.execute({ id, interaction })
   return reply.status(204).send()
 }
+
+const uploadLogoParamsSchema = z.object({
+  id: z.string().uuid(),
+})
+
+export async function uploadPartnerLogo(request: FastifyRequest, reply: FastifyReply) {
+  const { id } = uploadLogoParamsSchema.parse(request.params)
+  const data = await request.file()
+
+  if (!data) {
+    throw new AppError('Nenhum arquivo enviado.', 400)
+  }
+
+  const fileBuffer = await data.toBuffer()
+  const useCase = makeUploadPartnerLogo()
+  const { partner } = await useCase.execute({
+    partnerId: id,
+    fileName: data.filename,
+    mimetype: data.mimetype,
+    file: fileBuffer,
+  })
+
+  return reply.status(200).send({ partner })
+}
+
+const uploadBannerImageParamsSchema = z.object({
+  id: z.string().uuid(),
+})
+
+export async function uploadBannerImage(request: FastifyRequest, reply: FastifyReply) {
+  const { id } = uploadBannerImageParamsSchema.parse(request.params)
+  const data = await request.file()
+
+  if (!data) {
+    throw new AppError('Nenhum arquivo enviado.', 400)
+  }
+
+  const fileBuffer = await data.toBuffer()
+  const useCase = makeUploadBannerImage()
+  const { banner } = await useCase.execute({
+    bannerId: id,
+    fileName: data.filename,
+    mimetype: data.mimetype,
+    file: fileBuffer,
+  })
+
+  return reply.status(200).send({ banner })
+}
+

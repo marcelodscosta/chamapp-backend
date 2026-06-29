@@ -11,6 +11,8 @@ import {
   deleteBanner,
   trackInteraction,
   getPartner,
+  uploadPartnerLogo,
+  uploadBannerImage,
 } from './partners-controller'
 import { requireRole } from '../../middleware/auth'
 import { Role } from '../../../generated/prisma'
@@ -32,4 +34,7 @@ export async function partnerRoutes(app: FastifyInstance) {
   app.get('/partners/banners', { preHandler: [requireRole(Role.ADMIN, Role.OPERATOR)] }, listBanners)
   app.put('/partners/banners/:id', { preHandler: [requireRole(Role.ADMIN, Role.OPERATOR)] }, updateBanner)
   app.delete('/partners/banners/:id', { preHandler: [requireRole(Role.ADMIN)] }, deleteBanner)
+
+  app.patch('/partners/:id/logo', { preHandler: [requireRole(Role.ADMIN, Role.OPERATOR)] }, uploadPartnerLogo)
+  app.patch('/partners/banners/:id/image', { preHandler: [requireRole(Role.ADMIN, Role.OPERATOR)] }, uploadBannerImage)
 }

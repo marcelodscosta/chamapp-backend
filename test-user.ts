@@ -95,6 +95,40 @@ async function main() {
     })
   }
 
+  // 6. Criar Parceiro Comercial
+  const partner = await prisma.partner.upsert({
+    where: { id: 'a52a3b04-f5eb-42cc-a0ff-3e4b0258d451' },
+    update: { is_active: true },
+    create: {
+      id: 'a52a3b04-f5eb-42cc-a0ff-3e4b0258d451',
+      name: 'Farmácia Saúde & Cia',
+      logo_url: 'https://images.unsplash.com/photo-1607619056574-7b8d304b3b86?w=200&auto=format&fit=crop',
+      description: 'Apresente seu pedido finalizado do ChamApp Gás e ganhe 15% de desconto em qualquer medicamento genérico!',
+      phone: '74988887777',
+      address: 'Praça da Misericórdia, 12 - Centro, Juazeiro - BA',
+      website: 'https://instagram.com/farmaciasaudecia',
+      is_active: true,
+    }
+  })
+
+  // 7. Criar Banner do Parceiro
+  const tomorrow = new Date()
+  tomorrow.setDate(tomorrow.getDate() + 30)
+
+  await prisma.partnerBanner.upsert({
+    where: { id: 'f87a8b09-bde8-48fe-89ae-38ff02a0a2df' },
+    update: { is_active: true },
+    create: {
+      id: 'f87a8b09-bde8-48fe-89ae-38ff02a0a2df',
+      partnerId: partner.id,
+      image_url: 'https://images.unsplash.com/photo-1513151233558-d860c5398176?w=800&auto=format&fit=crop&q=60',
+      target_type: 'PARTNER_PROFILE',
+      priority: 1,
+      is_active: true,
+      expires_at: tomorrow,
+    }
+  })
+
   console.log('Test data created successfully!')
 }
 
