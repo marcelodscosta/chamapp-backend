@@ -14,7 +14,6 @@ export interface UpdateUserData {
   phone?: string
   avatar_url?: string
   password_hash?: string
-  is_active?: boolean
 }
 
 export interface IUserRepository {
