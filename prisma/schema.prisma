@@ -397,3 +397,47 @@ model OtpCode {
 
   @@map("otp_codes")
 }
+
+// ===========================
+// Parcerias e Anúncios (Co-marketing)
+// ===========================
+
+enum BannerTargetType {
+  EXTERNAL_LINK
+  PARTNER_PROFILE
+}
+
+model Partner {
+  id          String   @id @default(uuid())
+  name        String
+  logo_url    String?
+  description String?
+  phone       String?
+  address     String?
+  website     String?
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  banners     PartnerBanner[]
+
+  @@map("partners")
+}
+
+model PartnerBanner {
+  id           String           @id @default(uuid())
+  partnerId    String
+  image_url    String
+  target_type  BannerTargetType @default(EXTERNAL_LINK)
+  target_url   String?
+  priority     Int              @default(0)
+  views_count  Int              @default(0)
+  clicks_count Int              @default(0)
+  is_active    Boolean          @default(true)
+  expires_at   DateTime?
+  created_at   DateTime         @default(now())
+
+  partner      Partner          @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  @@map("partner_banners")
+}
