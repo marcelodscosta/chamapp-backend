@@ -4,6 +4,7 @@ import { IPushTokenRepository } from '../../repositories/interfaces/IPushTokenRe
 import { IPushNotificationProvider } from '../../providers/PushNotificationProvider/IPushNotificationProvider'
 import { ILoyaltyRepository } from '../../repositories/interfaces/ILoyaltyRepository'
 import { AddPointsTransactionUseCase } from '../loyalty/add-points-transaction-use-case'
+import { appEvents } from '../../lib/events'
 import { AppError } from '../errors/app-error'
 
 interface UpdateOrderStatusRequest {
@@ -157,6 +158,8 @@ export class UpdateOrderStatusUseCase {
         })
       }
     }
+
+    appEvents.emit('order:status_updated', updatedOrder)
 
     return { order: updatedOrder }
   }

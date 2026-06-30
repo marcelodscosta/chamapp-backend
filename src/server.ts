@@ -23,6 +23,10 @@ async function main() {
     appEvents.on('order:created', (order) => {
       io.emit('order:created', order)
     })
+    
+    appEvents.on('order:status_updated', (order) => {
+      io.emit('order:status_updated', order)
+    })
 
     io.on('connection', (socket) => {
       logger.info(`🔌 Novo painel conectado via WebSocket: ${socket.id}`)
