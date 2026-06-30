@@ -26,6 +26,7 @@ export interface CreateBannerData {
   target_url?: string
   priority?: number
   expires_at?: Date | string
+  show_on_home?: boolean
 }
 
 export interface UpdateBannerData {
@@ -35,6 +36,7 @@ export interface UpdateBannerData {
   priority?: number
   is_active?: boolean
   expires_at?: Date | string | null
+  show_on_home?: boolean
 }
 
 export interface IPartnerRepository {

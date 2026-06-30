@@ -11,7 +11,21 @@ import { Partner, PartnerBanner } from '../../generated/prisma'
 export class PrismaPartnerRepository implements IPartnerRepository {
   // --- CRUD Parceiros ---
   async findPartnerById(id: string): Promise<Partner | null> {
-    return prisma.partner.findUnique({ where: { id } })
+    return prisma.partner.findUnique({
+      where: { id },
+      include: {
+        banners: {
+          where: {
+            is_active: true,
+            OR: [
+              { expires_at: null },
+              { expires_at: { gte: new Date() } }
+            ]
+          },
+          orderBy: { priority: 'asc' },
+        },
+      },
+    })
   }
 
   async listAllPartners(): Promise<Partner[]> {
@@ -48,6 +62,7 @@ export class PrismaPartnerRepository implements IPartnerRepository {
     return prisma.partnerBanner.findMany({
       where: {
         is_active: true,
+        show_on_home: true,
         OR: [
           { expires_at: null },
           { expires_at: { gte: now } }
@@ -73,6 +88,7 @@ export class PrismaPartnerRepository implements IPartnerRepository {
         target_type: data.target_type,
         target_url: data.target_url,
         priority: data.priority,
+        show_on_home: data.show_on_home ?? false,
         expires_at: data.expires_at ? new Date(data.expires_at) : null,
       },
     })
@@ -87,6 +103,7 @@ export class PrismaPartnerRepository implements IPartnerRepository {
         target_url: data.target_url,
         priority: data.priority,
         is_active: data.is_active,
+        show_on_home: data.show_on_home,
         expires_at: data.expires_at === null ? null : data.expires_at ? new Date(data.expires_at) : undefined,
       },
     })

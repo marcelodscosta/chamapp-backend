@@ -436,6 +436,7 @@ model PartnerBanner {
   clicks_count Int              @default(0)
   is_active    Boolean          @default(true)
   expires_at   DateTime?
+  show_on_home Boolean          @default(false)
   created_at   DateTime         @default(now())
 
   partner      Partner          @relation(fields: [partnerId], references: [id], onDelete: Cascade)

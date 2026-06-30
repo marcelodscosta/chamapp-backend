@@ -103,6 +103,7 @@ const createBannerBodySchema = z.object({
   target_type: z.nativeEnum(BannerTargetType),
   target_url: z.string().optional(),
   priority: z.number().int().optional(),
+  show_on_home: z.boolean().optional(),
   expires_at: z.string().datetime().optional().or(z.string().date().optional()),
 })
 
@@ -135,6 +136,7 @@ const updateBannerBodySchema = z.object({
   target_url: z.string().optional(),
   priority: z.number().int().optional(),
   is_active: z.boolean().optional(),
+  show_on_home: z.boolean().optional(),
   expires_at: z.string().datetime().nullable().optional(),
 })
 
