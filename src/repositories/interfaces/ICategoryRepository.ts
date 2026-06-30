@@ -3,12 +3,14 @@ import { ProductCategory } from '../../generated/prisma'
 export interface CreateCategoryData {
   name: string
   order?: number
+  image_url?: string | null
 }
 
 export interface UpdateCategoryData {
   name?: string
   order?: number
   is_active?: boolean
+  image_url?: string | null
 }
 
 export interface ICategoryRepository {

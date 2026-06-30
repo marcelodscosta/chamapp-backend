@@ -23,6 +23,7 @@ export class InMemoryCategoryRepository implements ICategoryRepository {
       name: data.name,
       order: data.order ?? 0,
       is_active: true,
+      image_url: data.image_url ?? null,
       created_at: new Date(),
     }
     this.items.push(category)

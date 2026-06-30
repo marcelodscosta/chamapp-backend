@@ -118,6 +118,7 @@ model ProductCategory {
   name       String    @unique
   order      Int       @default(0)
   is_active  Boolean   @default(true)
+  image_url  String?
   created_at DateTime  @default(now())
 
   products Product[]

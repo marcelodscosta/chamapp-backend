@@ -7,6 +7,7 @@ interface UpdateCategoryRequest {
   name?: string
   order?: number
   isActive?: boolean
+  imageUrl?: string
 }
 
 interface UpdateCategoryResponse {
@@ -21,6 +22,7 @@ export class UpdateCategoryUseCase {
     name,
     order,
     isActive,
+    imageUrl,
   }: UpdateCategoryRequest): Promise<UpdateCategoryResponse> {
     const categoryExists = await this.categoryRepository.findById(categoryId)
 
@@ -32,6 +34,7 @@ export class UpdateCategoryUseCase {
       name,
       order,
       is_active: isActive,
+      image_url: imageUrl,
     })
 
     return { category }

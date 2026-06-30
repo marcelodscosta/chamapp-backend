@@ -12,6 +12,7 @@ import {
   toggleProductAvailability,
 } from './products-controller'
 import { uploadProductImage } from './upload-product-image-controller'
+import { uploadCategoryImage } from './upload-category-image-controller'
 import { requireRole } from '../../middleware/auth'
 import { Role } from '../../../generated/prisma'
 
@@ -27,6 +28,11 @@ export async function catalogRoutes(app: FastifyInstance) {
     '/categories/:id',
     { preHandler: [requireRole(Role.ADMIN, Role.OPERATOR)] },
     updateCategory,
+  )
+  app.patch(
+    '/categories/:id/image',
+    { preHandler: [requireRole(Role.ADMIN, Role.OPERATOR)] },
+    uploadCategoryImage,
   )
 
   // ─── Produtos ─────────────────────────────────────────────────────────────

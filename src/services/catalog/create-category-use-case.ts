@@ -4,6 +4,7 @@ import { ICategoryRepository } from '../../repositories/interfaces/ICategoryRepo
 interface CreateCategoryRequest {
   name: string
   order?: number
+  imageUrl?: string
 }
 
 interface CreateCategoryResponse {
@@ -16,10 +17,12 @@ export class CreateCategoryUseCase {
   async execute({
     name,
     order,
+    imageUrl,
   }: CreateCategoryRequest): Promise<CreateCategoryResponse> {
     const category = await this.categoryRepository.create({
       name,
       order,
+      image_url: imageUrl,
     })
 
     return { category }
