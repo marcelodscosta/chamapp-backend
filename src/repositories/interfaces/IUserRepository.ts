@@ -6,6 +6,7 @@ export interface CreateUserData {
   password_hash: string
   role?: Role
   phone?: string
+  avatar_url?: string
 }
 
 export interface UpdateUserData {
