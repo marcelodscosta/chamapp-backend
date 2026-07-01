@@ -107,6 +107,7 @@ export class InMemoryPartnerRepository implements IPartnerRepository {
       priority: data.priority ?? 0,
       views_count: 0,
       clicks_count: 0,
+      show_on_home: data.show_on_home ?? false,
       is_active: true,
       expires_at: data.expires_at ? new Date(data.expires_at) : null,
       created_at: new Date(),

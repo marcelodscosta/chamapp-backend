@@ -130,9 +130,14 @@ export class PrismaDashboardRepository implements IDashboardRepository {
       averageTicket: data.quantitySold > 0 ? data.totalRevenue / data.quantitySold : 0
     })).sort((a, b) => b.totalRevenue - a.totalRevenue) // Ordenar por receita gerada
 
+    const totalRevenue = Number(revenueAggr._sum.total_value) || 0;
+    const totalOrders = revenueAggr._count.id || 0;
+    const averageTicket = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
     return {
-      totalRevenue: Number(revenueAggr._sum.total_value) || 0,
-      totalOrders: revenueAggr._count.id || 0,
+      totalRevenue,
+      totalOrders,
+      averageTicket,
       ordersByStatus,
       revenueByDay,
       salesByPaymentMethod,

@@ -22,6 +22,7 @@ export interface ProductSales {
 export interface DashboardMetrics {
   totalRevenue: number
   totalOrders: number
+  averageTicket?: number
   ordersByStatus: Record<string, number>
   revenueByDay: RevenueByDay[]
   salesByPaymentMethod: SalesByPaymentMethod[]
