@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: chamapp-backend
+    env: node
+    plan: free
+    region: ohio
+    buildCommand: npm install && npm run db:generate && npm run build
+    startCommand: npm run db:deploy && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: chamapp-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+
+databases:
+  - name: chamapp-db
+    plan: free
+    region: ohio
