@@ -9,7 +9,7 @@
     "build": "tsup src/server.ts prisma/seed.ts --format cjs --out-dir dist",
     "start": "node dist/src/server.js",
     "db:migrate": "prisma migrate dev",
-    "db:deploy": "prisma migrate deploy",
+    "db:deploy": "prisma migrate deploy && npm run db:seed",
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset",
