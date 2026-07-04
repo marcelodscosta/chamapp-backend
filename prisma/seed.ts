@@ -105,10 +105,10 @@ async function main() {
 
   // ─── Tiers de fidelidade ────────────────────────────────────────────────────
   const tiers = [
-    { name: 'Bronze', min_points: 0, multiplier: 1.0, color_hex: '#CD7F32', order: 1, benefits: ['Acesso básico ao programa de pontos'] },
-    { name: 'Prata', min_points: 1000, multiplier: 1.25, color_hex: '#C0C0C0', order: 2, benefits: ['Pontos bônus 1.25x', 'Frete grátis acima de R$ 80'] },
-    { name: 'Ouro', min_points: 5000, multiplier: 1.5, color_hex: '#FFD700', order: 3, benefits: ['Pontos bônus 1.5x', 'Prioridade no atendimento'] },
-    { name: 'Diamante', min_points: 15000, multiplier: 2.0, color_hex: '#B9F2FF', order: 4, benefits: ['Pontos bônus 2x', 'Ofertas exclusivas', 'Push VIP'] },
+    { name: 'Bronze', min_spent: 0, period_days: 30, multiplier: 1.0, color_hex: '#CD7F32', order: 1, benefits: ['Acesso básico ao programa de pontos'] },
+    { name: 'Prata', min_spent: 150, period_days: 30, multiplier: 1.25, color_hex: '#C0C0C0', order: 2, benefits: ['Pontos bônus 1.25x', 'Frete grátis acima de R$ 80'] },
+    { name: 'Ouro', min_spent: 300, period_days: 30, multiplier: 1.5, color_hex: '#FFD700', order: 3, benefits: ['Pontos bônus 1.5x', 'Prioridade no atendimento'] },
+    { name: 'Diamante', min_spent: 500, period_days: 30, multiplier: 2.0, color_hex: '#B9F2FF', order: 4, benefits: ['Pontos bônus 2x', 'Ofertas exclusivas', 'Push VIP'] },
   ]
 
   for (const tier of tiers) {

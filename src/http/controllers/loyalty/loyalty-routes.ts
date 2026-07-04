@@ -4,7 +4,6 @@ import {
   updateLoyaltyConfig,
   createLoyaltyTier,
   listLoyaltyTiers,
-  listLoyaltyTiers,
   updateLoyaltyTier,
   deleteLoyaltyTier,
   getLoyaltyAccount,
