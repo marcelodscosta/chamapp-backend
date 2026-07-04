@@ -328,9 +328,10 @@ model LoyaltyConfig {
 }
 
 model LoyaltyTier {
-  id         String   @id @default(uuid())
-  name       String   @unique
-  min_points Int
+  id          String   @id @default(uuid())
+  name        String   @unique
+  min_spent   Decimal  @default(0) @db.Decimal(10, 2)
+  period_days Int      @default(30)
   multiplier Decimal  @default(1) @db.Decimal(4, 2)
   color_hex  String?
   icon_url   String?

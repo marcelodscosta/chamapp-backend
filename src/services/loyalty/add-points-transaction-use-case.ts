@@ -1,6 +1,7 @@
 import { LoyaltyAccount } from '../../generated/prisma'
 import { ILoyaltyRepository } from '../../repositories/interfaces/ILoyaltyRepository'
 import { AppError } from '../errors/app-error'
+import { CalculateUserTierUseCase } from './calculate-user-tier-use-case'
 
 interface AddPointsRequest {
   customerId: string
@@ -71,14 +72,13 @@ export class AddPointsTransactionUseCase {
       account.balance_points,
     )
 
-    // Verifica se houve upgrade de Tier
-    const newTier = await this.loyaltyRepository.findTierByPoints(
-      account.total_earned,
-    )
+    // Recalcula o Tier do usuário de acordo com o histórico de gastos e dias
+    const calculateTier = new CalculateUserTierUseCase()
+    const { tier: newTier } = await calculateTier.execute({ customerId })
 
     if (newTier && newTier.id !== account.tierId) {
-      // Futuro: Lógica para dar upgrade real (Update na conta com novo Tier)
-      // Por simplicidade do MVP, poderíamos atualizar o tierId do LoyaltyAccount aqui.
+      // Atualiza a conta com o novo Tier sem zerar os pontos
+      account = await this.loyaltyRepository.updateAccountTier(account.id, newTier.id)
     }
 
     return { account }

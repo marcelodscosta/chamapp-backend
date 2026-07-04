@@ -52,14 +52,6 @@ export class PrismaLoyaltyRepository implements ILoyaltyRepository {
     })
   }
 
-  async findTierByPoints(points: number): Promise<LoyaltyTier | null> {
-    return prisma.loyaltyTier.findFirst({
-      where: {
-        min_points: { lte: points },
-      },
-      orderBy: { min_points: 'desc' },
-    })
-  }
 
   async getAccountByCustomerId(
     customerId: string,
@@ -112,6 +104,14 @@ export class PrismaLoyaltyRepository implements ILoyaltyRepository {
           // Pega também se precisar rebaixar de tier (teria que ver o tier atual)
         ],
       },
+      include: { tier: true },
+    })
+  }
+
+  async updateAccountTier(accountId: string, newTierId: string): Promise<LoyaltyAccount> {
+    return prisma.loyaltyAccount.update({
+      where: { id: accountId },
+      data: { tierId: newTierId },
       include: { tier: true },
     })
   }

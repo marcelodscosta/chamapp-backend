@@ -17,14 +17,16 @@ describe('ProcessInactivityUseCase', () => {
 
     const tierBronze = await loyaltyRepository.createTier({
       name: 'Bronze',
-      min_points: 0,
+      min_spent: 0,
+      period_days: 30,
       order: 1,
     })
     tierBronzeId = tierBronze.id
 
     const tierOuro = await loyaltyRepository.createTier({
-      name: 'Ouro',
-      min_points: 1000,
+      name: 'Prata',
+      min_spent: 1000,
+      period_days: 30,
       order: 2,
     })
     tierOuroId = tierOuro.id

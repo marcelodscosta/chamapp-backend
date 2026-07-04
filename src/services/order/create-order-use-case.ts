@@ -171,7 +171,7 @@ export class CreateOrderUseCase {
           accountId: account.id,
           orderId: order.id,
           type: 'REDEEMED',
-          points: pointsRedeemed,
+          points: -pointsRedeemed,
           description: `Desconto de R$ ${pointsDiscount.toFixed(2).replace('.', ',')} no pedido ${order.order_number}`,
         }, newBalance)
         await this.loyaltyRepository.updateAccountBalance(account.id, -pointsRedeemed, 0, false)

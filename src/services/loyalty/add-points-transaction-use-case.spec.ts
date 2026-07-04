@@ -24,7 +24,7 @@ describe('AddPointsTransactionUseCase', () => {
       program_enabled: true,
       program_mode: 'POINTS',
     })
-    await loyaltyRepository.createTier({ name: 'Bronze', min_points: 0 })
+    await loyaltyRepository.createTier({ name: 'Bronze', min_spent: 0, period_days: 30 })
 
     const { account } = await sut.execute({
       customerId: 'user-1',

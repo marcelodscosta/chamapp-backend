@@ -22,7 +22,8 @@ export interface UpdateLoyaltyConfigData {
 
 export interface CreateTierData {
   name: string
-  min_points: number
+  min_spent: Decimal | number
+  period_days: number
   multiplier?: Decimal | number
   color_hex?: string
   icon_url?: string
@@ -52,7 +53,6 @@ export interface ILoyaltyRepository {
   // Tiers
   createTier(data: CreateTierData): Promise<LoyaltyTier>
   listTiers(): Promise<LoyaltyTier[]>
-  findTierByPoints(points: number): Promise<LoyaltyTier | null>
 
   // Account
   getAccountByCustomerId(customerId: string): Promise<LoyaltyAccount | null>
@@ -63,6 +63,7 @@ export interface ILoyaltyRepository {
     cashbackToAdd: number,
     isEarned: boolean,
   ): Promise<LoyaltyAccount>
+  updateAccountTier(accountId: string, newTierId: string): Promise<LoyaltyAccount>
   listInactiveAccounts(thresholdDate: Date): Promise<LoyaltyAccount[]>
   resetAccountInactivity(accountId: string, baseTierId: string): Promise<LoyaltyAccount>
 

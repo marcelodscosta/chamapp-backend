@@ -1,5 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { z } from 'zod'
+import { prisma } from '../../../lib/prisma'
 import {
   makeGetLoyaltyConfig,
   makeUpdateLoyaltyConfig,
@@ -39,8 +40,9 @@ export async function updateLoyaltyConfig(
 }
 
 const createTierBodySchema = z.object({
-  name: z.string().min(1),
-  min_points: z.number().int().min(0),
+  name: z.string().min(2),
+  min_spent: z.number().min(0),
+  period_days: z.number().int().min(1),
   multiplier: z.number().min(1).optional(),
   color_hex: z.string().optional(),
   icon_url: z.string().url().optional(),
@@ -58,6 +60,46 @@ export async function createLoyaltyTier(
   return reply.status(201).send({ tier })
 }
 
+export async function listLoyaltyTiers(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  const tiers = await prisma.loyaltyTier.findMany({
+    orderBy: { min_spent: 'asc' },
+  })
+  return reply.status(200).send({ tiers })
+}
+
+const updateTierParamsSchema = z.object({
+  id: z.string().uuid(),
+})
+
+const updateTierBodySchema = z.object({
+  name: z.string().min(2).optional(),
+  min_spent: z.number().min(0).optional(),
+  period_days: z.number().int().min(1).optional(),
+  multiplier: z.number().min(1).optional(),
+  color_hex: z.string().optional(),
+  icon_url: z.string().url().optional(),
+  benefits: z.array(z.string()).optional(),
+  order: z.number().int().optional(),
+})
+
+export async function updateLoyaltyTier(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  const { id } = updateTierParamsSchema.parse(request.params)
+  const data = updateTierBodySchema.parse(request.body)
+
+  const tier = await prisma.loyaltyTier.update({
+    where: { id },
+    data,
+  })
+
+  return reply.status(200).send({ tier })
+}
+
 export async function getLoyaltyAccount(
   request: FastifyRequest,
   reply: FastifyReply,
@@ -66,4 +108,17 @@ export async function getLoyaltyAccount(
   // Cliente consulta sua própria conta
   const { account, transactions } = await useCase.execute(request.user!.id)
   return reply.status(200).send({ account, transactions })
+}
+
+export async function deleteLoyaltyTier(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  const { id } = updateTierParamsSchema.parse(request.params)
+
+  await prisma.loyaltyTier.delete({
+    where: { id },
+  })
+
+  return reply.status(204).send()
 }

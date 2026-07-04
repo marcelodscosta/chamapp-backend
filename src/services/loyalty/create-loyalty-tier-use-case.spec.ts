@@ -14,7 +14,8 @@ describe('CreateLoyaltyTierUseCase', () => {
   it('deve criar um nível (tier) de fidelidade', async () => {
     const { tier } = await sut.execute({
       name: 'Bronze',
-      min_points: 0,
+      min_spent: 0,
+      period_days: 30,
       multiplier: 1,
     })
 

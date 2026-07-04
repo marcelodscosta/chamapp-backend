@@ -55,7 +55,8 @@ export class InMemoryLoyaltyRepository implements ILoyaltyRepository {
     const tier: LoyaltyTier = {
       id: randomUUID(),
       name: data.name,
-      min_points: data.min_points,
+      min_spent: new Decimal(data.min_spent),
+      period_days: data.period_days,
       multiplier: new Decimal(data.multiplier ?? 1),
       color_hex: data.color_hex ?? null,
       icon_url: data.icon_url ?? null,
@@ -68,12 +69,6 @@ export class InMemoryLoyaltyRepository implements ILoyaltyRepository {
 
   async listTiers(): Promise<LoyaltyTier[]> {
     return this.tiers.sort((a, b) => a.order - b.order)
-  }
-
-  async findTierByPoints(points: number): Promise<LoyaltyTier | null> {
-    const eligibleTiers = this.tiers.filter((t) => t.min_points <= points)
-    if (eligibleTiers.length === 0) return null
-    return eligibleTiers.sort((a, b) => b.min_points - a.min_points)[0]
   }
 
   async getAccountByCustomerId(
@@ -167,6 +162,15 @@ export class InMemoryLoyaltyRepository implements ILoyaltyRepository {
     return this.accounts.filter(
       (a) => a.last_activity_at < thresholdDate && (a.balance_points > 0 || Number(a.balance_cashback) > 0)
     )
+  }
+
+  async updateAccountTier(accountId: string, newTierId: string): Promise<LoyaltyAccount> {
+    const account = this.accounts.find((a) => a.id === accountId)
+    if (!account) throw new Error('Account not found')
+    account.tierId = newTierId
+    const tier = this.tiers.find((t) => t.id === newTierId)!
+    ;(account as any).tier = tier
+    return account
   }
 
   async resetAccountInactivity(accountId: string, baseTierId: string): Promise<LoyaltyAccount> {

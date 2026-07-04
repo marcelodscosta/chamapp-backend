@@ -20,7 +20,8 @@ describe('GetLoyaltyAccountUseCase', () => {
   it('deve retornar a conta e transações', async () => {
     const tier = await loyaltyRepository.createTier({
       name: 'Bronze',
-      min_points: 0,
+      min_spent: 0,
+      period_days: 30,
     })
     const acc = await loyaltyRepository.createAccount({
       customerId: 'user-1',
