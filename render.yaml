@@ -15,6 +15,18 @@ services:
           property: connectionString
       - key: JWT_SECRET
         generateValue: true
+      - key: B2_ENDPOINT
+        value: https://s3.us-east-005.backblazeb2.com
+      - key: B2_REGION
+        value: us-east-005
+      - key: B2_BUCKET
+        value: storage-top-locacoes
+      - key: B2_ACCESS_KEY_ID
+        value: 005c79b6aef32690000000003
+      - key: B2_SECRET_ACCESS_KEY
+        value: K005fJm9Fnhw1J3I0muugyH5i+yIKqg
+      - key: B2_PUBLIC_BASE_URL
+        value: https://s3.us-east-005.backblazeb2.com/storage-top-locacoes
 
 databases:
   - name: chamapp-db
