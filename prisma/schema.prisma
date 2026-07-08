@@ -105,8 +105,26 @@ model User {
   addresses      Address[]
   pushTokens     PushToken[]
   loyaltyAccount LoyaltyAccount?
+  location       UserLocation?
 
   @@map("users")
+}
+
+// ===========================
+// Localização de Usuários
+// ===========================
+
+model UserLocation {
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  latitude         Float
+  longitude        Float
+  has_active_order Boolean  @default(false)
+  last_seen_at     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("user_locations")
 }
 
 // ===========================
