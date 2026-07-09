@@ -93,21 +93,25 @@ export class UpdateOrderStatusUseCase {
       try {
         const config = await this.loyaltyRepository.getConfig()
         if (config?.program_enabled && order.customerId) {
-          const addPoints = new AddPointsTransactionUseCase(
-            this.loyaltyRepository,
-          )
-          // Exemplo básico: converte subtotal para pontos baseado em points_per_real
-          const pointsEarned = Math.floor(
-            Number(order.subtotal) * Number(config.points_per_real),
-          )
+          // Regra de negócio: se utilizou pontos na compra, não ganha novos pontos
+          if (order.points_redeemed === 0) {
+            const addPoints = new AddPointsTransactionUseCase(
+              this.loyaltyRepository,
+            )
+            // Exemplo básico: converte subtotal para pontos baseado em points_per_real
+            const pointsEarned = Math.floor(
+              Number(order.subtotal) * Number(config.points_per_real),
+            )
 
-          if (pointsEarned > 0) {
-            await addPoints.execute({
-              customerId: order.customerId,
-              orderId: order.id,
-              points: pointsEarned,
-              description: `Pedido ${order.order_number}`,
-            })
+            if (pointsEarned > 0) {
+              updateData.points_earned = pointsEarned
+              await addPoints.execute({
+                customerId: order.customerId,
+                orderId: order.id,
+                points: pointsEarned,
+                description: `Pedido ${order.order_number}`,
+              })
+            }
           }
         }
       } catch (err) {
