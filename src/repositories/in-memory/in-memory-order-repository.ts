@@ -140,4 +140,16 @@ export class InMemoryOrderRepository implements IOrderRepository {
 
     return `${prefix}-${nextNumber}`
   }
+
+  async hasActiveOrder(customerId: string): Promise<boolean> {
+    const activeStatuses: OrderStatus[] = [
+      OrderStatus.PENDING,
+      OrderStatus.CONFIRMED,
+      OrderStatus.PREPARING,
+      OrderStatus.OUT_FOR_DELIVERY,
+    ]
+    return this.items.some(
+      (o) => o.customerId === customerId && activeStatuses.includes(o.status),
+    )
+  }
 }

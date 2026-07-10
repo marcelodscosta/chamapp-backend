@@ -126,7 +126,12 @@ export class PrismaOrderRepository implements IOrderRepository {
       where: {
         customerId,
         status: {
-          in: ['PENDING', 'ACCEPTED', 'IN_TRANSIT'],
+          in: [
+            OrderStatus.PENDING,
+            OrderStatus.CONFIRMED,
+            OrderStatus.PREPARING,
+            OrderStatus.OUT_FOR_DELIVERY,
+          ],
         },
       },
     })
