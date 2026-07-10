@@ -7,13 +7,21 @@ export class ExpoPushNotificationProvider implements IPushNotificationProvider {
   async send(message: SendPushMessage): Promise<void> {
     if (message.tokens.length === 0) return
 
-    const messages = message.tokens.map((token) => ({
-      to: token,
-      sound: 'default',
-      title: message.title,
-      body: message.body,
-      data: message.data,
-    }))
+    const messages = message.tokens.map((token) => {
+      const msg: any = {
+        to: token,
+        sound: 'default',
+        title: message.title,
+        body: message.body,
+        data: message.data,
+      }
+      
+      if (message.data?.imageUrl) {
+        msg.image = message.data.imageUrl
+      }
+
+      return msg
+    })
 
     try {
       const response = await fetch('https://exp.host/--/api/v2/push/send', {
