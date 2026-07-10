@@ -5,6 +5,7 @@
 export const PUBLIC_ROUTES: Array<{ method: string; path: RegExp | string }> = [
   { method: 'POST', path: '/auth/login' },
   { method: 'POST', path: '/auth/register' },
+  { method: 'POST', path: '/auth/google' },
   { method: 'POST', path: '/auth/forgot-password' },
   { method: 'POST', path: '/auth/reset-password' },
   { method: 'GET', path: '/products' },
