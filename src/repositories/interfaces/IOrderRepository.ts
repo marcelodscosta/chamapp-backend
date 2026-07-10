@@ -61,4 +61,5 @@ export interface IOrderRepository {
     extra?: Partial<Order>,
   ): Promise<Order>
   getNextOrderNumber(): Promise<string>
+  hasActiveOrder(customerId: string): Promise<boolean>
 }

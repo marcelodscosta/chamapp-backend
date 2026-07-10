@@ -66,6 +66,15 @@ export class CreateOrderUseCase {
       throw new AppError('Endereço inválido.', 403)
     }
 
+    // 2. Validar se não tem pedido em andamento
+    const hasActive = await this.orderRepository.hasActiveOrder(customerId)
+    if (hasActive) {
+      throw new AppError(
+        'Você já possui um pedido em andamento. Aguarde a conclusão para fazer um novo pedido.',
+        400,
+      )
+    }
+
     // 2. Calcular subtotal e criar array de itens processados
     let subtotal = 0
     let requiresEmptyReturnCount = 0

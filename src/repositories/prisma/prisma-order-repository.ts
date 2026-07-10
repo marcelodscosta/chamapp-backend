@@ -120,4 +120,16 @@ export class PrismaOrderRepository implements IOrderRepository {
 
     return `${prefix}-${nextNumber}`
   }
+
+  async hasActiveOrder(customerId: string): Promise<boolean> {
+    const count = await prisma.order.count({
+      where: {
+        customerId,
+        status: {
+          in: ['PENDING', 'ACCEPTED', 'IN_TRANSIT'],
+        },
+      },
+    })
+    return count > 0
+  }
 }
