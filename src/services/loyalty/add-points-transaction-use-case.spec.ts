@@ -3,6 +3,19 @@ import { AddPointsTransactionUseCase } from './add-points-transaction-use-case'
 import { InMemoryLoyaltyRepository } from '../../repositories/in-memory/in-memory-loyalty-repository'
 import { AppError } from '../errors/app-error'
 
+import { vi } from 'vitest'
+
+// Mock do CalculateUserTierUseCase para não acessar o banco real
+vi.mock('./calculate-user-tier-use-case', () => {
+  return {
+    CalculateUserTierUseCase: vi.fn().mockImplementation(() => {
+      return {
+        execute: vi.fn().mockResolvedValue({ tier: { id: 'fake-tier' } })
+      }
+    })
+  }
+})
+
 let loyaltyRepository: InMemoryLoyaltyRepository
 let sut: AddPointsTransactionUseCase
 

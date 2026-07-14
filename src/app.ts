@@ -16,6 +16,7 @@ import { settingsRoutes } from './http/controllers/store/settings-routes'
 import { loyaltyRoutes } from './http/controllers/loyalty/loyalty-routes'
 import { dashboardRoutes } from './http/controllers/dashboard/dashboard-routes'
 import { partnerRoutes } from './http/controllers/partner/partner-routes'
+import { teamRoutes } from './http/controllers/team/team-routes'
 
 
 export async function buildApp() {
@@ -50,14 +51,20 @@ export async function buildApp() {
   await app.register(dashboardRoutes)
   await app.register(marketingRoutes)
   await app.register(partnerRoutes)
+  await app.register(teamRoutes)
 
 
   // ─── Error Handler Global ──────────────────────────────────────────────────
   app.setErrorHandler((error, request, reply) => {
-    if (error instanceof ZodError) {
+    if (error instanceof ZodError || (error as any).name === 'ZodError') {
+      const zodError = error as ZodError
+      
+      // Converte os erros do Zod para uma mensagem de texto simples para facilitar pro frontend
+      const errorMessages = zodError.errors.map(err => `${err.path.join('.')}: ${err.message}`).join(', ')
+      
       return reply.status(400).send({
-        message: 'Erro de validação.',
-        errors: error.flatten().fieldErrors,
+        message: `Erro de validação: ${errorMessages}`,
+        errors: zodError.flatten().fieldErrors,
       })
     }
 
