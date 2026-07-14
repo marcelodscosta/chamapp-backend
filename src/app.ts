@@ -17,7 +17,7 @@ import { loyaltyRoutes } from './http/controllers/loyalty/loyalty-routes'
 import { dashboardRoutes } from './http/controllers/dashboard/dashboard-routes'
 import { partnerRoutes } from './http/controllers/partner/partner-routes'
 import { teamRoutes } from './http/controllers/team/team-routes'
-
+import { systemRoutes } from './http/controllers/system/system-routes'
 
 export async function buildApp() {
   const app = fastify({ logger: false })
@@ -52,6 +52,7 @@ export async function buildApp() {
   await app.register(marketingRoutes)
   await app.register(partnerRoutes)
   await app.register(teamRoutes)
+  await app.register(systemRoutes)
 
 
   // ─── Error Handler Global ──────────────────────────────────────────────────
