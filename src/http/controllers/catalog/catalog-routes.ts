@@ -10,6 +10,7 @@ import {
   getProduct,
   listProducts,
   toggleProductAvailability,
+  deleteProduct,
 } from './products-controller'
 import { uploadProductImage } from './upload-product-image-controller'
 import { uploadCategoryImage } from './upload-category-image-controller'
@@ -58,6 +59,11 @@ export async function catalogRoutes(app: FastifyInstance) {
     '/products/:id/image',
     { preHandler: [requireRole(Role.ADMIN, Role.OPERATOR)] },
     uploadProductImage,
+  )
+  app.delete(
+    '/products/:id',
+    { preHandler: [requireRole(Role.ADMIN, Role.OPERATOR)] },
+    deleteProduct,
   )
 
   // (O patch para /products/:id/stock viria depois num controle de estoque)

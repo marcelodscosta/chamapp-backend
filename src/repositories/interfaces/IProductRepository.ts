@@ -43,4 +43,6 @@ export interface IProductRepository {
   create(data: CreateProductData): Promise<Product>
   update(id: string, data: UpdateProductData): Promise<Product>
   updateAvailability(id: string, isAvailable: boolean): Promise<Product>
+  delete(id: string): Promise<void>
+  softDelete(id: string): Promise<void>
 }

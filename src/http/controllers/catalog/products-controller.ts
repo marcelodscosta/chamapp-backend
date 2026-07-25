@@ -5,6 +5,7 @@ import { makeUpdateProduct } from '../../../services/factories/make-update-produ
 import { makeGetProduct } from '../../../services/factories/make-get-product'
 import { makeListProducts } from '../../../services/factories/make-list-products'
 import { makeToggleProductAvailability } from '../../../services/factories/make-toggle-product-availability'
+import { makeDeleteProduct } from '../../../services/factories/make-delete-product'
 
 const createProductBodySchema = z.object({
   categoryId: z.string().uuid().optional(),
@@ -117,4 +118,20 @@ export async function toggleProductAvailability(
   const { product } = await useCase.execute({ productId: id })
 
   return reply.status(200).send({ product })
+}
+
+const deleteProductParamsSchema = z.object({
+  id: z.string().uuid(),
+})
+
+export async function deleteProduct(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  const { id } = deleteProductParamsSchema.parse(request.params)
+
+  const useCase = makeDeleteProduct()
+  await useCase.execute({ productId: id })
+
+  return reply.status(204).send()
 }

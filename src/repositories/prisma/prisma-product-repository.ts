@@ -64,4 +64,17 @@ export class PrismaProductRepository implements IProductRepository {
       data: { is_available: isAvailable },
     })
   }
+
+  async delete(id: string): Promise<void> {
+    await prisma.product.delete({
+      where: { id },
+    })
+  }
+
+  async softDelete(id: string): Promise<void> {
+    await prisma.product.update({
+      where: { id },
+      data: { is_active: false, is_available: false },
+    })
+  }
 }

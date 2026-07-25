@@ -103,4 +103,20 @@ export class InMemoryProductRepository implements IProductRepository {
     this.items[index].updated_at = new Date()
     return this.items[index]
   }
+
+  async delete(id: string): Promise<void> {
+    const index = this.items.findIndex((p) => p.id === id)
+    if (index !== -1) {
+      this.items.splice(index, 1)
+    }
+  }
+
+  async softDelete(id: string): Promise<void> {
+    const index = this.items.findIndex((p) => p.id === id)
+    if (index !== -1) {
+      this.items[index].is_active = false
+      this.items[index].is_available = false
+      this.items[index].updated_at = new Date()
+    }
+  }
 }
