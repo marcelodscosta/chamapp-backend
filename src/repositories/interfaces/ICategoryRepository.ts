@@ -18,4 +18,6 @@ export interface ICategoryRepository {
   listAll(): Promise<ProductCategory[]>
   create(data: CreateCategoryData): Promise<ProductCategory>
   update(id: string, data: UpdateCategoryData): Promise<ProductCategory>
+  delete(id: string): Promise<void>
+  softDelete(id: string): Promise<void>
 }

@@ -27,4 +27,17 @@ export class PrismaCategoryRepository implements ICategoryRepository {
       data,
     })
   }
+
+  async delete(id: string): Promise<void> {
+    await prisma.productCategory.delete({
+      where: { id },
+    })
+  }
+
+  async softDelete(id: string): Promise<void> {
+    await prisma.productCategory.update({
+      where: { id },
+      data: { is_active: false },
+    })
+  }
 }

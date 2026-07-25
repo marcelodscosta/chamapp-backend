@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { makeCreateCategory } from '../../../services/factories/make-create-category'
 import { makeListCategories } from '../../../services/factories/make-list-categories'
 import { makeUpdateCategory } from '../../../services/factories/make-update-category'
+import { makeDeleteCategory } from '../../../services/factories/make-delete-category'
 
 const createCategoryBodySchema = z.object({
   name: z.string().min(2, 'Nome deve ter ao menos 2 caracteres.'),
@@ -60,4 +61,20 @@ export async function updateCategory(
   })
 
   return reply.status(200).send({ category })
+}
+
+const deleteCategoryParamsSchema = z.object({
+  id: z.string().uuid(),
+})
+
+export async function deleteCategory(
+  request: FastifyRequest,
+  reply: FastifyReply,
+) {
+  const { id } = deleteCategoryParamsSchema.parse(request.params)
+
+  const useCase = makeDeleteCategory()
+  await useCase.execute({ categoryId: id })
+
+  return reply.status(204).send()
 }

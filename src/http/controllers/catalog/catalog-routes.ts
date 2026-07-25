@@ -3,6 +3,7 @@ import {
   createCategory,
   listCategories,
   updateCategory,
+  deleteCategory,
 } from './categories-controller'
 import {
   createProduct,
@@ -34,6 +35,11 @@ export async function catalogRoutes(app: FastifyInstance) {
     '/categories/:id/image',
     { preHandler: [requireRole(Role.ADMIN, Role.OPERATOR)] },
     uploadCategoryImage,
+  )
+  app.delete(
+    '/categories/:id',
+    { preHandler: [requireRole(Role.ADMIN, Role.OPERATOR)] },
+    deleteCategory,
   )
 
   // ─── Produtos ─────────────────────────────────────────────────────────────
