@@ -77,4 +77,44 @@ export class PrismaUserRepository implements IUserRepository {
       },
     })
   }
+
+  async deleteAccount(id: string): Promise<void> {
+    const user = await prisma.user.findUnique({
+      where: { id },
+      include: { orders: true },
+    })
+
+    if (!user) return
+
+    if (user.orders.length > 0) {
+      // Soft Delete (Anonimização)
+      await prisma.$transaction([
+        prisma.pushToken.deleteMany({ where: { userId: id } }),
+        prisma.userLocation.deleteMany({ where: { userId: id } }),
+        prisma.user.update({
+          where: { id },
+          data: {
+            name: 'Usuário Excluído',
+            email: `deleted_${id}@chamapp.com`,
+            phone: null,
+            password_hash: '',
+            is_active: false,
+            avatar_url: null,
+          },
+        }),
+      ])
+    } else {
+      // Hard Delete
+      await prisma.$transaction([
+        prisma.pushToken.deleteMany({ where: { userId: id } }),
+        prisma.userLocation.deleteMany({ where: { userId: id } }),
+        prisma.loyaltyTransaction.deleteMany({
+          where: { account: { customerId: id } },
+        }),
+        prisma.loyaltyAccount.deleteMany({ where: { customerId: id } }),
+        prisma.address.deleteMany({ where: { customerId: id } }),
+        prisma.user.delete({ where: { id } }),
+      ])
+    }
+  }
 }

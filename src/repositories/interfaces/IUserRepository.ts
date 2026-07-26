@@ -25,4 +25,5 @@ export interface IUserRepository {
   listAll(): Promise<User[]>
   toggleStatus(id: string): Promise<User>
   findUsersByMarketingFilter(filter: 'ALL' | 'NEVER_BOUGHT' | 'INACTIVE_30_DAYS'): Promise<User[]>
+  deleteAccount(id: string): Promise<void>
 }

@@ -65,4 +65,15 @@ export class InMemoryUserRepository implements IUserRepository {
   async findUsersByMarketingFilter(filter: 'ALL' | 'NEVER_BOUGHT' | 'INACTIVE_30_DAYS'): Promise<User[]> {
     return this.items.filter(u => u.role === 'CUSTOMER' && u.is_active)
   }
+
+  async deleteAccount(id: string): Promise<void> {
+    const user = this.items.find((item) => item.id === id)
+    if (!user) return
+
+    // Simular soft delete no in-memory
+    user.is_active = false
+    user.name = 'Usuário Excluído'
+    user.email = `deleted_${id}@chamapp.com`
+    user.password_hash = ''
+  }
 }

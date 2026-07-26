@@ -1,5 +1,6 @@
 import { FastifyInstance } from 'fastify'
 import { getProfile, updateProfile } from './profile-controller'
+import { deleteAccount } from '../users/delete-account-controller'
 import { listUsers, createStaff, toggleStatus, updateUser } from './users-controller'
 import { updateLocationController } from './update-location-controller'
 import { getUserLocationsController } from './get-user-locations-controller'
@@ -10,6 +11,7 @@ export async function userRoutes(app: FastifyInstance) {
   // ─── Perfil do usuário (qualquer usuário logado) ──────────────────────────
   app.get('/users/me', getProfile)
   app.put('/users/me', updateProfile)
+  app.delete('/users/me', deleteAccount)
   // app.patch('/users/me/avatar', uploadAvatar) // Fase posterior
 
   // ─── Localização em tempo real ────────────────────────────────────────────
